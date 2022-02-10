@@ -1,0 +1,5 @@
+--continuation-indentation=3
+--default-tabsize=3
+--entab-leading-whitespace=3
+--indent-columns=3
+--paren-tightness=2
