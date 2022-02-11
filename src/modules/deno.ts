@@ -1,13 +1,9 @@
 // TODO: parse deno.json and test for fmt.options etc.
 
-export function moduleDeno() {
-	return {
-		name: "Deno",
-		description: "For deno projects",
-		hooksFile: [
-			{
-				files: ["deno.json"],
-			},
-		],
-	};
-}
+export const name = "Deno";
+export const description = "Lint deno.json";
+export const onFilesHooks = [
+	{
+		files: ["deno.json"],
+	},
+];
