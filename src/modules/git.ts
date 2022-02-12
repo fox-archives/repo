@@ -1,6 +1,6 @@
 import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
 
-import * as log from "../util/log.ts";
+import * as util from "../util/util.ts";
 
 // TODO: insert 'auto eof etc. in gitattriutes as well as
 // linguist-generated for 'bake' file
@@ -29,7 +29,7 @@ export const onFiles = [
 					foxomateStart = false;
 					continue;
 				} else if (hasFoxomateDeclaration(line)) {
-					log.error(`Declaration not recognized: $line`);
+					util.logError(`Declaration not recognized: $line`);
 				}
 
 				if (foxomateStart) {

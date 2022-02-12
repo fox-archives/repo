@@ -1,6 +1,6 @@
 import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
 
-import * as log from "../util/log.ts";
+import * as util from "../util/util.ts";
 
 export const name = "Prettier";
 export const description = "Checks prettier configuration";
@@ -13,7 +13,7 @@ export const onFiles = [
 				const text = await Deno.readTextFile(entry.path);
 				packageJson = JSON.parse(text);
 			} catch (err) {
-				log.error(
+				util.logError(
 					`Could not parse packageJson file at ${entry.path}. Skipping`
 				);
 				return;
@@ -27,7 +27,7 @@ export const onFiles = [
 	{
 		files: [".prettierrc"],
 		fn() {
-			log.error("File '.prettierrc' recognized, but not supported");
+			util.logError("File '.prettierrc' recognized, but not supported");
 		},
 	},
 	{
@@ -39,7 +39,7 @@ export const onFiles = [
 				const text = await Deno.readTextFile(entry.path);
 				json = JSON.parse(text);
 			} catch (err) {
-				log.error(`Could not parse file ${entry.path} as JSON`);
+				util.logError(`Could not parse file ${entry.path} as JSON`);
 				console.error(err);
 				return;
 			}
@@ -50,13 +50,13 @@ export const onFiles = [
 	{
 		files: [".prettierrc.yml", ".prettierrc.yaml"],
 		fn() {
-			log.error("File '.prettierrc.ya?ml' recognized, but not supported");
+			util.logError("File '.prettierrc.ya?ml' recognized, but not supported");
 		},
 	},
 	{
 		files: [".prettierrc.json5"],
 		fn() {
-			log.error("File '.prettierrc.json5' recognized, but not supported");
+			util.logError("File '.prettierrc.json5' recognized, but not supported");
 		},
 	},
 	{
@@ -67,7 +67,7 @@ export const onFiles = [
 			"prettier.config.cjs",
 		],
 		fn() {
-			log.error(
+			util.logError(
 				"File '(.prettierrc|prettier.config).c?js' recognized, but not supported"
 			);
 		},
@@ -75,14 +75,14 @@ export const onFiles = [
 	{
 		files: [".prettierrc.toml"],
 		fn() {
-			log.error("File '.prettierrc.toml' recognized, but not supported");
+			util.logError("File '.prettierrc.toml' recognized, but not supported");
 		},
 	},
 ];
 
 function prettierLint(path: string, json: Record<string, any>) {
 	if (typeof json !== "object" || json === null) {
-		log.error(
+		util.logError(
 			`Prettier configuration object in ${path} is not actually an object. Skipping`
 		);
 		return;
@@ -92,27 +92,27 @@ function prettierLint(path: string, json: Record<string, any>) {
 
 	const jsonArr = Object.entries(json);
 	if (jsonArr.length !== 5) {
-		log.error("Expected 5 entries in prettiercfg");
+		util.logError("Expected 5 entries in prettiercfg");
 	}
 
 	if (json.tabWidth !== 3) {
-		log.error("tabWidth should be '3'");
+		util.logError("tabWidth should be '3'");
 	}
 
 	if (!json.useTabs) {
-		log.error("useTabs should be true");
+		util.logError("useTabs should be true");
 	}
 
 	if (!json.semi) {
-		log.error("semi should be true");
+		util.logError("semi should be true");
 	}
 
 	if (!json.singleQuote) {
-		log.error("singleQuote should be true");
+		util.logError("singleQuote should be true");
 	}
 
 	if (json.trailingComma !== "all") {
-		log.error("trailingComma should be 'all'");
+		util.logError("trailingComma should be 'all'");
 	}
 
 	console.info();
