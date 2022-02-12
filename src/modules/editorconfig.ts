@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
-import * as path from "https://deno.land/std@0.125.0/path/mod.ts";
+import { fs } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 

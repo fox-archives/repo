@@ -1,4 +1,4 @@
-import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
+import { fs } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 

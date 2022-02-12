@@ -1,5 +1,5 @@
-import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
-import * as toml from "https://deno.land/std@0.125.0/encoding/toml.ts";
+import { fs } from "../deps.ts";
+import { toml } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 
