@@ -4,7 +4,7 @@ import * as util from "../util/util.ts";
 
 export const name = "Deno";
 export const description = "Lints deno.json files";
-export const onFilesHooks = [
+export const onFiles = [
 	{
 		files: ["deno.json"],
 		async fn(entry: fs.WalkEntry) {

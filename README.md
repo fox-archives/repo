@@ -16,3 +16,4 @@ Right now, it lints for the following:
 - Have `--autofix` flag (dont' fix by default)
 - `.foxomateignore`
 - Make a proper CLI
+- Make it better

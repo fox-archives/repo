@@ -1,20 +1,5 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 
 task.run() {
-	local file="$1"
-	bake.assert_nonempty 'file'
-
-	perl "./bin/$file.pl"
-}
-
-task.lint() {
-	perlcritic .
-}
-
-task.fmt() {
-	perltidy ./**/*.pl
-
-	for f in ./**/*.pl.tdy; do
-		mv "$f" "${f%.tdy}"
-	done
+	deno run --allow-read --allow-write ./src/main.ts
 }

@@ -7,7 +7,7 @@ import * as util from "../util/util.ts";
 
 export const name = "Basalt";
 export const description = "Lints basalt.toml files";
-export const onFilesHooks = [
+export const onFiles = [
 	{
 		files: ["basalt.toml"],
 		async fn(entry: fs.WalkEntry) {
