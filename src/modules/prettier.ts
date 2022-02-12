@@ -4,7 +4,7 @@ import * as log from "../util/log.ts";
 
 export const name = "Prettier";
 export const description = "Checks prettier configuration";
-export const onFilesHooks = [
+export const onFiles = [
 	{
 		files: ["package.json"],
 		async fn(entry: fs.WalkEntry) {

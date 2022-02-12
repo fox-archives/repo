@@ -3,7 +3,7 @@ import * as path from "https://deno.land/std@0.125.0/path/mod.ts";
 
 export const name = "Deno";
 export const description = "Lint deno.json";
-export const onFilesHooks = [
+export const onFiles = [
 	{
 		files: [".editorconfig"],
 		async fn() {

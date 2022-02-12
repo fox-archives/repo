@@ -1,6 +1,9 @@
 import { parse } from "https://deno.land/std@0.125.0/flags/mod.ts";
-import { modulePrettier } from "./modules/prettier.ts";
 import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
+
+import * as modulePrettier from "./modules/prettier.ts";
+// import * as moduleEditorconfig from "./modules/editorconfig.ts";
+import * as moduleGit from "./modules/git.ts";
 
 const args = parse(Deno.args);
 
@@ -8,8 +11,6 @@ if (args.h || args.help) {
 	console.info(`Usage: foxomate`);
 	Deno.exit(0);
 }
-
-const prettier = modulePrettier();
 
 for await (const entry of fs.expandGlob("**/*", {
 	exclude: [
@@ -26,13 +27,33 @@ for await (const entry of fs.expandGlob("**/*", {
 		"out",
 		"dist",
 		".cache",
+		"third_party",
 	],
 })) {
-	for (const hook of prettier.hooksFile) {
-		for (const file of hook.files) {
+	// Prettier
+	for (const trigger of modulePrettier.onFiles) {
+		for (const file of trigger.files) {
 			if (file === entry.name) {
-				await hook.fn(entry);
+				await trigger.fn(entry);
 			}
 		}
 	}
+
+	// Git
+	for (const trigger of moduleGit.onFiles) {
+		for (const file of trigger.files) {
+			if (file === entry.name) {
+				await trigger.fn(entry);
+			}
+		}
+	}
+
+	// // EditorConfig
+	// for (const trigger of moduleEditorconfig.onFiles) {
+	// 	for (const file of trigger.files) {
+	// 		if (file === entry.name) {
+	// 			await trigger.fn(entry);
+	// 		}
+	// 	}
+	// }
 }

@@ -4,8 +4,7 @@ import * as log from "../util/log.ts";
 
 export const name = "bake";
 export const description = "Parses Bakefile.sh scripts for errors";
-// export const onAlwaysHook =
-export const onFilesHooks = [
+export const onFiles = [
 	{
 		files: ["Bakefile.sh"],
 		async fn(entry: fs.WalkEntry) {
