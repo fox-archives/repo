@@ -1,105 +1,76 @@
 #!/usr/bin/env node
+import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
 import * as path from "https://deno.land/std@0.125.0/path/mod.ts";
+
+import * as util from "../util/util.ts";
+
+export function ensureEditorconfigKeyValue(
+	text: string,
+	glob: string,
+	key: string,
+	value: string
+) {
+	if (!text.match(new RegExp(""))) {
+		util.logError(`For glob '${glob}', key '${key}' must be set to '${value}`);
+	}
+}
+
+/**
+ * @description Ensures a particular key is _not set_. It does not
+ * cover cases in which keys are *literally* set to 'unset'
+ */
+export function ensureEditorconfigKeyNotSet(
+	lines: string[],
+	glob: string,
+	key: string
+) {
+	let currentGlob = "";
+	for (const line in lines) {
+		if (line === `[${glob}]`) {
+			currentGlob = glob;
+			continue;
+		}
+
+		if (currentGlob == glob) {
+			if (line.includes(key)) {
+				util.logError(
+					`For glob ${glob}, key ${key} must be unset. (not even set to the value 'unset')`
+				);
+			}
+		}
+	}
+}
+
+// TODO ensure sorting
 
 export const name = "Deno";
 export const description = "Lint deno.json";
 export const onFiles = [
 	{
 		files: [".editorconfig"],
-		async fn() {
-			const editorConfigFile = ".editorconfig";
-			// Use file ending of underscore to match [*]
-			const filePath = path.join(path.dirname(editorConfigFile), "_._");
+		async fn(entry: fs.WalkEntry) {
+			const text = await Deno.readTextFile(entry.path);
+			const lines = text.split("\n");
 
-			const result = await editorconfig.parseFromFiles(
-				filePath,
-				Promise.resolve([
-					{
-						name: editorConfigFile,
-						contents: await Deno.readTextFile(editorConfigFile),
-					},
-				])
-			);
-
-			if (result.indent_style !== "tab") {
-				printError(
-					0,
-					0,
-					"default-indent-style",
-					"Default indent_style must be set to tab"
-				);
-			}
-			if (result.indent_size !== "unset") {
-				printError(
-					0,
-					0,
-					"default-indent-size",
-					"Default indent_style must be unset"
-				);
-			}
-			if (result.tab_width !== void 0) {
-				printError(
-					0,
-					0,
-					"default-tab-width",
-					"Default tab_width must not be set"
-				);
-			}
-			if (result.end_of_line !== "lf") {
-				printError(
-					0,
-					0,
-					"default-end-of-line",
-					"Default end_of_line must be 'lf'"
-				);
-			}
-			if (result.charset !== "utf-8") {
-				printError(
-					0,
-					0,
-					"default-charset",
-					"Default charset must be set to 'utf-8'"
-				);
-			}
-			if (result.trim_trailing_whitespace !== true) {
-				printError(
-					0,
-					0,
-					"default-trim_trailing-whitespace",
-					"Default trim_trailing_whitespace must be set to 'true'"
-				);
-			}
-			if (result.insert_final_newline !== true) {
-				printError(
-					0,
-					0,
-					"default-insert-final-newline",
-					"Default insert_final_newline must be set to 'true'"
-				);
+			if (lines[0] != "root = true") {
+				util.logError("Must have declaration 'root = true' at top of file");
 			}
 
-			// Read File
-			const editorConfigFileContents = await Deno.readTextFile(
-				editorConfigFile
-			);
-
-			// Start linting
-
-			if (editorConfigFileContents.slice(0, 11) !== "root = true") {
-				printError(
-					0,
-					0,
-					"required-top-level-root-true",
-					"The first 11 characters must be `root = true`"
-				);
-			}
+			ensureEditorconfigKeyValue(text, "*", "indent-style", "tab");
+			ensureEditorconfigKeyNotSet(lines, "*", "indent-size");
+			ensureEditorconfigKeyNotSet(lines, "*", "tab-width");
+			ensureEditorconfigKeyValue(text, "*", "end_of_line", "lf");
+			ensureEditorconfigKeyValue(text, "*", "charset", "utf-8");
+			ensureEditorconfigKeyValue(text, "*", "trim_trailing_whitespace", "true");
+			ensureEditorconfigKeyValue(text, "*", "insert_final_newline", "true");
+			ensureEditorconfigKeyNotSet(lines, "*", "max_line_length");
 
 			let rowIndex = 1;
 			let columnIndex = 1;
-			for (let j = 1; j < editorConfigFileContents.length - 1; ++j) {
-				const char = editorConfigFileContents[j];
-				const previousChar = editorConfigFileContents[j - 1];
-				const nextChar = editorConfigFileContents[j + 1];
+			for (let j = 1; j < text.length - 1; ++j) {
+				const char = text[j];
+				const previousChar = text[j - 1];
+				const nextChar = text[j + 1];
 
 				if (char === "\n") {
 					columnIndex = 0;
@@ -111,7 +82,7 @@ export const onFiles = [
 				switch (char) {
 					case "[":
 						if (previousChar !== "\n") {
-							printError(
+							util.printLineError(
 								rowIndex,
 								columnIndex,
 								"required-newline-before-start-bracket",
@@ -120,7 +91,7 @@ export const onFiles = [
 						}
 
 						if (nextChar === " " || nextChar === "\t") {
-							printError(
+							util.printLineError(
 								rowIndex,
 								columnIndex,
 								"no-whitespace-after-start-bracket",
@@ -130,7 +101,7 @@ export const onFiles = [
 						break;
 					case "]":
 						if (previousChar === " " || previousChar === "\t") {
-							printError(
+							util.printLineError(
 								rowIndex,
 								columnIndex,
 								"no-whitespace-before-end-bracket",
@@ -139,7 +110,7 @@ export const onFiles = [
 						}
 
 						if (nextChar !== "\n") {
-							printError(
+							util.printLineError(
 								rowIndex,
 								columnIndex,
 								"required-newline-after-end-bracket",
@@ -149,7 +120,7 @@ export const onFiles = [
 						break;
 					case "=":
 						if (previousChar !== " ") {
-							printError(
+							util.printLineError(
 								rowIndex,
 								columnIndex,
 								"required-space-before-equals",
@@ -158,7 +129,7 @@ export const onFiles = [
 						}
 
 						if (nextChar !== " ") {
-							printError(
+							util.printLineError(
 								rowIndex,
 								columnIndex,
 								"required-space-after-equals",
@@ -168,7 +139,7 @@ export const onFiles = [
 						break;
 					case "\n":
 						if (nextChar === " " || nextChar === "\t") {
-							printError(
+							util.printLineError(
 								rowIndex,
 								columnIndex,
 								"no-whitespace-after-newline",
@@ -178,29 +149,6 @@ export const onFiles = [
 						break;
 					default:
 						break;
-				}
-			}
-
-			/**
-			 * @param {number} rowIndex
-			 * @param {number} columnIndex
-			 * @param {string} code
-			 * @param {string} summary
-			 */
-			function printError(
-				rowIndex: number,
-				columnIndex: number,
-				code: string,
-				summary: string
-			) {
-				if (formatter === "unix") {
-					console.log(
-						`${editorConfigFile}:${rowIndex}:${columnIndex}: ${summary}. [Error/${code}]`
-					);
-				} else if (formatter === "visualstudio") {
-					console.log(
-						`${editorConfigFile}(${rowIndex},${columnIndex}): error ${code} : ${summary}.`
-					);
 				}
 			}
 		},

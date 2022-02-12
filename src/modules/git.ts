@@ -2,9 +2,6 @@ import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
 
 import * as util from "../util/util.ts";
 
-// TODO: insert 'auto eof etc. in gitattriutes as well as
-// linguist-generated for 'bake' file
-
 function hasFoxomateDeclaration(line: string, value = "") {
 	return line.match(new RegExp(`^(?:#|//)[ \t]*foxomate[ \t]*${value}`));
 }

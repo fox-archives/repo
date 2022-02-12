@@ -6,45 +6,49 @@ import * as util from "../util/util.ts";
 // TODO: test to ensure the following do or do not have || exit prepended
 
 export const name = "Basalt";
-export const description = "For Basalt projects";
+export const description = "Lints basalt.toml files";
 export const onFilesHooks = [
 	{
 		files: ["basalt.toml"],
 		async fn(entry: fs.WalkEntry) {
-			util.logInfo(`Running for file ${entry.path}`);
-
 			const text = await Deno.readTextFile(entry.path);
-			const json = toml.parse(text);
-			const pkg = json.package as Record<string, any>;
+			const tomlObj = toml.parse(text);
+			const pkg = tomlObj.package as Record<string, any>;
 
 			if (!pkg) {
-				util.logError("There should be a 'package' entry");
+				util.logMissingProperty("package");
 				return;
 			}
 
 			if (!pkg.type) {
-				util.logError("There should be a 'package.type' entry");
+				util.logMissingProperty("package.type");
 			}
+			util.ensureNotEmpty("package.type", pkg.type);
 
 			if (!pkg.name) {
-				util.logError("There should be a 'package.name' entry");
+				util.logMissingProperty("package.name");
 			}
+			util.ensureNotEmpty("package.type", pkg.name);
 
 			if (!pkg.slug) {
-				util.logError("There should be a 'package.slug' entry");
+				util.logMissingProperty("package.slug");
 			}
+			util.ensureNotEmpty("package.type", pkg.slug);
 
 			if (!pkg.version) {
-				util.logError("There should be a 'package.version' entry");
+				util.logMissingProperty("package.version");
 			}
+			util.ensureNotEmpty("package.type", pkg.version);
 
 			if (!pkg.authors) {
-				util.logError("There should be an 'package.authors' entry");
+				util.logMissingProperty("package.authors");
 			}
+			util.ensureNotEmpty("package.type", pkg.authors);
 
 			if (!pkg.description) {
-				util.logError("There should be a 'package.descriptions' entry");
+				util.logMissingProperty("package.description");
 			}
+			util.ensureNotEmpty("package.type", pkg.description);
 		},
 	},
 ];

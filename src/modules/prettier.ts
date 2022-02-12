@@ -88,8 +88,6 @@ function prettierLint(path: string, json: Record<string, any>) {
 		return;
 	}
 
-	console.info(`Checking file '${path}`);
-
 	const jsonArr = Object.entries(json);
 	if (jsonArr.length !== 5) {
 		util.logError("Expected 5 entries in prettiercfg");
