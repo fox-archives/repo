@@ -11,7 +11,7 @@ export const description = "Checks .gitattributes file";
 export const onFiles = [
 	{
 		files: [".gitattributes"],
-		async fn(entry: fs.WalkEntry) {
+		async fn(opts: util.Opts, entry: fs.WalkEntry) {
 			const text = await Deno.readTextFile(entry.path);
 
 			let linesFoxomate = [];

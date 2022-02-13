@@ -1,3 +1,7 @@
+export type Opts = {
+	fix: "no" | "prompt" | "auto";
+};
+
 export function die(msg: string) {
 	logError(msg);
 	Deno.exit(1);

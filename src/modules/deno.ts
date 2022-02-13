@@ -7,7 +7,7 @@ export const description = "Lints deno.json files";
 export const onFiles = [
 	{
 		files: ["deno.json"],
-		async fn(entry: fs.WalkEntry) {
+		async fn(opts: util.Opts, entry: fs.WalkEntry) {
 			const text = await Deno.readTextFile(entry.path);
 			const jsonObj = JSON.parse(text);
 

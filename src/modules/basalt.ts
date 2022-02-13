@@ -10,7 +10,7 @@ export const description = "Lints basalt.toml files";
 export const onFiles = [
 	{
 		files: ["basalt.toml"],
-		async fn(entry: fs.WalkEntry) {
+		async fn(opts: util.Opts, entry: fs.WalkEntry) {
 			const text = await Deno.readTextFile(entry.path);
 			const tomlObj = toml.parse(text);
 			const pkg = tomlObj.package as Record<string, any>;

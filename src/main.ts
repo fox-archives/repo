@@ -1,21 +1,56 @@
-import * as flags from "https://deno.land/std@0.125.0/flags/mod.ts";
-import * as fs from "https://deno.land/std@0.125.0/fs/mod.ts";
+import { fs, path, flags } from "./deps.ts";
 
 import * as util from "./util/util.ts";
-import * as moduleBake from "./modules/bake.ts";
-import * as moduleBasalt from "./modules/basalt.ts";
-import * as moduleDeno from "./modules/deno.ts";
-import * as moduleEditorconfig from "./modules/editorconfig.ts";
-import * as moduleGit from "./modules/git.ts";
-import * as modulePrettier from "./modules/prettier.ts";
 
 await main();
 async function main() {
 	const args = flags.parse(Deno.args);
 
+	const modules = [
+		"bake",
+		"basalt",
+		"deno",
+		"editorconfig",
+		"git",
+		"glue",
+		"prettier",
+	];
+	const shouldRunModule = (cmd: string) =>
+		args._[0] === "all" || args._.includes(cmd);
+
 	if (args.h || args.help) {
-		console.info(`Usage: foxomate`);
+		console.info(`foxomate
+
+Summary: My linter / checker
+
+Usage: foxomate [flags] [modules ...]
+
+Flags:
+  --help
+  --fix=no|prompt|auto
+
+Modules:
+${modules.map((item) => `  - ${item}\n`).join("")}`);
 		Deno.exit(0);
+	}
+
+	if (args._.length === 0) {
+		util.logInfo("No modules specified, none ran");
+		Deno.exit(0);
+	}
+
+	const opts: util.Opts = {
+		fix: "prompt",
+	};
+
+	if (args.fix === "no" || args.fix === "yes") {
+		opts.fix = args.fix;
+	}
+
+	for (const runner of modules) {
+		if (shouldRunModule(runner)) {
+			util.logInfo(`Detected '${runner}'`);
+		}
 	}
 
 	for await (const entry of fs.expandGlob("**/*", {
@@ -36,37 +71,25 @@ async function main() {
 			"third_party",
 		],
 	})) {
-		if (args.bake) {
-			runModule(moduleBake, entry);
-		}
+		for (const runner of modules) {
+			if (shouldRunModule(runner)) {
+				const module = await import(`./modules/${runner}.ts`);
 
-		if (args.basalt) {
-			runModule(moduleBasalt, entry);
-		}
-
-		if (args.deno) {
-			runModule(moduleDeno, entry);
-		}
-
-		if (args.editorconfig) {
-			runModule(moduleEditorconfig, entry);
-		}
-
-		if (args.git) {
-			runModule(moduleGit, entry);
-		}
-
-		if (args.prettier) {
-			runModule(modulePrettier, entry);
+				runModule(opts, module, entry);
+			}
 		}
 	}
 }
 
-async function runModule(module: any, entry: fs.WalkEntry) {
+async function runModule(opts: util.Opts, module: any, entry: fs.WalkEntry) {
+	if (module.init) {
+		module.init(opts);
+	}
+
 	for (const trigger of module.onFiles) {
 		for (const file of trigger.files) {
 			if (file === entry.name) {
-				await trigger.fn(entry);
+				await trigger.fn(opts, entry);
 			}
 		}
 	}

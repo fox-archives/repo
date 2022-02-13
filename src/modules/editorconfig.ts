@@ -4,13 +4,30 @@ import { fs } from "../deps.ts";
 import * as util from "../util/util.ts";
 
 export function ensureEditorconfigKeyValue(
-	text: string,
+	lines: string[],
 	glob: string,
 	key: string,
 	value: string
 ) {
-	if (!text.match(new RegExp(""))) {
-		util.logError(`For glob '${glob}', key '${key}' must be set to '${value}`);
+	let currentGlob = "";
+	let foundMatch = false;
+	for (const line of lines) {
+		if (line === `[${glob}]`) {
+			if (currentGlob !== "" && !foundMatch) {
+				util.logError(
+					`For glob ${glob}, key ${key} must have value of ${value}')`
+				);
+			}
+
+			currentGlob = glob;
+			continue;
+		}
+
+		if (currentGlob == glob) {
+			if (line.match(new RegExp(`^[ \t]*${key}[ \t]*=[ \t]*${value}`))) {
+				foundMatch = true;
+			}
+		}
 	}
 }
 
@@ -24,7 +41,7 @@ export function ensureEditorconfigKeyNotSet(
 	key: string
 ) {
 	let currentGlob = "";
-	for (const line in lines) {
+	for (const line of lines) {
 		if (line === `[${glob}]`) {
 			currentGlob = glob;
 			continue;
@@ -47,7 +64,7 @@ export const description = "Lint deno.json";
 export const onFiles = [
 	{
 		files: [".editorconfig"],
-		async fn(entry: fs.WalkEntry) {
+		async fn(opts: util.Opts, entry: fs.WalkEntry) {
 			const text = await Deno.readTextFile(entry.path);
 			const lines = text.split("\n");
 
@@ -55,13 +72,22 @@ export const onFiles = [
 				util.logError("Must have declaration 'root = true' at top of file");
 			}
 
-			ensureEditorconfigKeyValue(text, "*", "indent-style", "tab");
+			if (lines[2] != "[*]") {
+				util.logError("Must have specifier '[*]' on third line");
+			}
+
+			ensureEditorconfigKeyValue(lines, "*", "indent-style", "tab");
 			ensureEditorconfigKeyNotSet(lines, "*", "indent-size");
 			ensureEditorconfigKeyNotSet(lines, "*", "tab-width");
-			ensureEditorconfigKeyValue(text, "*", "end_of_line", "lf");
-			ensureEditorconfigKeyValue(text, "*", "charset", "utf-8");
-			ensureEditorconfigKeyValue(text, "*", "trim_trailing_whitespace", "true");
-			ensureEditorconfigKeyValue(text, "*", "insert_final_newline", "true");
+			ensureEditorconfigKeyValue(lines, "*", "end_of_line", "lf");
+			ensureEditorconfigKeyValue(lines, "*", "charset", "utf-8");
+			ensureEditorconfigKeyValue(
+				lines,
+				"*",
+				"trim_trailing_whitespace",
+				"true"
+			);
+			ensureEditorconfigKeyValue(lines, "*", "insert_final_newline", "true");
 			ensureEditorconfigKeyNotSet(lines, "*", "max_line_length");
 
 			let rowIndex = 1;

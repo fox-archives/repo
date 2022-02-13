@@ -7,7 +7,7 @@ export const description = "Lints Bakefiles";
 export const onFiles = [
 	{
 		files: ["Bakefile.sh"],
-		async fn(entry: fs.WalkEntry) {
+		async fn(opts: util.Opts, entry: fs.WalkEntry) {
 			const text = await Deno.readTextFile(entry.path);
 			for (const line of text.split("\n")) {
 				if (line.includes("task.fmt()")) {

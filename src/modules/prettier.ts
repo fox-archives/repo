@@ -7,7 +7,7 @@ export const description = "Checks prettier configuration";
 export const onFiles = [
 	{
 		files: ["package.json"],
-		async fn(entry: fs.WalkEntry) {
+		async fn(opts: util.Opts, entry: fs.WalkEntry) {
 			let packageJson;
 			try {
 				const text = await Deno.readTextFile(entry.path);
@@ -32,7 +32,7 @@ export const onFiles = [
 	},
 	{
 		files: [".prettierrc.json"],
-		async fn(entry: fs.WalkEntry) {
+		async fn(opts: util.Opts, entry: fs.WalkEntry) {
 			let json;
 
 			try {
