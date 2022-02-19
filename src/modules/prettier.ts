@@ -113,5 +113,5 @@ function prettierLint(path: string, json: Record<string, any>) {
 		util.logError("trailingComma should be 'all'");
 	}
 
-	console.info();
+	console.log();
 }

@@ -3,62 +3,7 @@ import { fs } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 
-export function ensureEditorconfigKeyValue(
-	lines: string[],
-	glob: string,
-	key: string,
-	value: string
-) {
-	let currentGlob = "";
-	let foundMatch = false;
-	for (const line of lines) {
-		if (line === `[${glob}]`) {
-			if (currentGlob !== "" && !foundMatch) {
-				util.logError(
-					`For glob ${glob}, key ${key} must have value of ${value}')`
-				);
-			}
-
-			currentGlob = glob;
-			continue;
-		}
-
-		if (currentGlob == glob) {
-			if (line.match(new RegExp(`^[ \t]*${key}[ \t]*=[ \t]*${value}`))) {
-				foundMatch = true;
-			}
-		}
-	}
-}
-
-/**
- * @description Ensures a particular key is _not set_. It does not
- * cover cases in which keys are *literally* set to 'unset'
- */
-export function ensureEditorconfigKeyNotSet(
-	lines: string[],
-	glob: string,
-	key: string
-) {
-	let currentGlob = "";
-	for (const line of lines) {
-		if (line === `[${glob}]`) {
-			currentGlob = glob;
-			continue;
-		}
-
-		if (currentGlob == glob) {
-			if (line.includes(key)) {
-				util.logError(
-					`For glob ${glob}, key ${key} must be unset. (not even set to the value 'unset')`
-				);
-			}
-		}
-	}
-}
-
 // TODO ensure sorting
-
 export const name = "Deno";
 export const description = "Lint deno.json";
 export const onFiles = [
@@ -179,3 +124,57 @@ export const onFiles = [
 		},
 	},
 ];
+
+export function ensureEditorconfigKeyValue(
+	lines: string[],
+	glob: string,
+	key: string,
+	value: string
+) {
+	let currentGlob = "";
+	let foundMatch = false;
+	for (const line of lines) {
+		if (line === `[${glob}]`) {
+			if (currentGlob !== "" && !foundMatch) {
+				util.logError(
+					`For glob ${glob}, key ${key} must have value of ${value}')`
+				);
+			}
+
+			currentGlob = glob;
+			continue;
+		}
+
+		if (currentGlob == glob) {
+			if (line.match(new RegExp(`^[ \t]*${key}[ \t]*=[ \t]*${value}`))) {
+				foundMatch = true;
+			}
+		}
+	}
+}
+
+/**
+ * @description Ensures a particular key is _not set_. It does not
+ * cover cases in which keys are *literally* set to 'unset'
+ */
+export function ensureEditorconfigKeyNotSet(
+	lines: string[],
+	glob: string,
+	key: string
+) {
+	let currentGlob = "";
+	for (const line of lines) {
+		if (line === `[${glob}]`) {
+			currentGlob = glob;
+			continue;
+		}
+
+		if (currentGlob == glob) {
+			if (line.includes(key)) {
+				util.logError(
+					`For glob ${glob}, key ${key} must be unset. (not even set to the value 'unset')`
+				);
+			}
+		}
+	}
+}

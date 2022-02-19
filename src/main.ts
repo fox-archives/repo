@@ -1,58 +1,70 @@
-import { fs, path, flags } from "./deps.ts";
+import { c, fs, flags, path } from "./deps.ts";
 
 import * as util from "./util/util.ts";
 
-await main();
-async function main() {
-	const args = flags.parse(Deno.args);
+const args = flags.parse(Deno.args);
+interface Module {
+	name: string;
+	description: string;
+	init?: (opts?: util.Opts) => void;
+	onFiles?: Array<{
+		files: string[];
+		fn: (opts: util.Opts, entry: fs.WalkEntry) => void;
+	}>;
+}
 
-	const modules = [
-		"bake",
-		"basalt",
-		"deno",
-		"editorconfig",
-		"git",
-		"glue",
-		"prettier",
-	];
-	const shouldRunModule = (cmd: string) =>
-		args._[0] === "all" || args._.includes(cmd);
+// Declare main data
+const modules: {
+	[key: string]: Array<() => void>;
+} = {};
+for (const module of [
+	"bake",
+	"basalt",
+	"deno",
+	"editorconfig",
+	"git",
+	"glue",
+	"prettier",
+	"shellcheck",
+]) {
+	modules[module] = [];
+}
 
+// Argument parsing
+const opts: util.Opts = {
+	fix: "prompt",
+};
+{
 	if (args.h || args.help) {
-		console.info(`foxomate
+		console.log(`foxomate
 
-Summary: My linter / checker
+	Summary: My linter / checker
 
-Usage: foxomate [flags] [modules ...]
+	Usage: foxomate [flags] [modules ...]
 
-Flags:
-  --help
-  --fix=no|prompt|auto
+	Flags:
+	  --help
+	  --fix=no|prompt|auto
 
-Modules:
-${modules.map((item) => `  - ${item}\n`).join("")}`);
+	Modules:
+	${Object.keys(modules)
+		.map((item) => `  - ${item}\n`)
+		.join("")}`);
 		Deno.exit(0);
 	}
 
 	if (args._.length === 0) {
-		util.logInfo("No modules specified, none ran");
+		console.log("No modules specified, none ran");
 		Deno.exit(0);
 	}
 
-	const opts: util.Opts = {
-		fix: "prompt",
-	};
-
-	if (args.fix === "no" || args.fix === "yes") {
+	if (args.fix !== "no" || args.fix !== "yes") {
 		opts.fix = args.fix;
 	}
+}
 
-	for (const runner of modules) {
-		if (shouldRunModule(runner)) {
-			util.logInfo(`Detected '${runner}'`);
-		}
-	}
-
+// Add functions to each module queue
+{
 	for await (const entry of fs.expandGlob("**/*", {
 		exclude: [
 			"bower_components",
@@ -71,26 +83,53 @@ ${modules.map((item) => `  - ${item}\n`).join("")}`);
 			"third_party",
 		],
 	})) {
-		for (const runner of modules) {
-			if (shouldRunModule(runner)) {
-				const module = await import(`./modules/${runner}.ts`);
+		for (const moduleName of Object.keys(modules)) {
+			const shouldRunModule = (cmd: string) => {
+				return args._[0] === "all" || args._.includes(cmd);
+			};
 
-				runModule(opts, module, entry);
+			if (!shouldRunModule(moduleName)) {
+				continue;
+			}
+			const module: Module = await import(`./modules/${moduleName}.ts`);
+			if (module.init && modules[moduleName].length === 0) {
+				modules[moduleName].push(async () => {
+					console.log(
+						`${c.magenta("Running init for module")}Running init for module ${
+							module.name
+						}`
+					);
+
+					if (!module.init) return;
+					await module.init(opts);
+				});
+			}
+
+			if (module.onFiles) {
+				for (const trigger of module.onFiles) {
+					for (const file of trigger.files) {
+						if (file === entry.name) {
+							modules[moduleName].push(async () => {
+								console.log(`File ./${path.relative(Deno.cwd(), entry.path)}`);
+								await trigger.fn(opts, entry);
+							});
+						}
+					}
+				}
 			}
 		}
 	}
 }
 
-async function runModule(opts: util.Opts, module: any, entry: fs.WalkEntry) {
-	if (module.init) {
-		module.init(opts);
-	}
+// Run modules
+{
+	for (const [moduleName, module] of Object.entries(modules)) {
+		if (module.length === 0) continue;
 
-	for (const trigger of module.onFiles) {
-		for (const file of trigger.files) {
-			if (file === entry.name) {
-				await trigger.fn(opts, entry);
-			}
+		console.log(`Module ${c.underline(c.magenta(moduleName))}`);
+		for (const fn of module) {
+			await fn();
 		}
+		console.log();
 	}
 }

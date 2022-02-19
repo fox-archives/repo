@@ -11,10 +11,6 @@ export function logError(msg: string) {
 	console.error(`Error: ${msg}`);
 }
 
-export function logInfo(msg: string) {
-	console.info(`Info: ${msg}`);
-}
-
 export function printLineError(
 	row: number,
 	column: number,
