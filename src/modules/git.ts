@@ -26,7 +26,7 @@ export const onFiles = [
 					foxomateStart = false;
 					continue;
 				} else if (hasFoxomateDeclaration(line)) {
-					util.logError(`Declaration not recognized: $line`);
+					util.logInfo(`Declaration not recognized: $line`);
 				}
 
 				if (foxomateStart) {

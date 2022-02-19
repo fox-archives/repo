@@ -14,11 +14,11 @@ export const onFiles = [
 			const lines = text.split("\n");
 
 			if (lines[0] != "root = true") {
-				util.logError("Must have declaration 'root = true' at top of file");
+				util.logInfo("Must have declaration 'root = true' at top of file");
 			}
 
 			if (lines[2] != "[*]") {
-				util.logError("Must have specifier '[*]' on third line");
+				util.logInfo("Must have specifier '[*]' on third line");
 			}
 
 			ensureEditorconfigKeyValue(lines, "*", "indent-style", "tab");
@@ -136,7 +136,7 @@ export function ensureEditorconfigKeyValue(
 	for (const line of lines) {
 		if (line === `[${glob}]`) {
 			if (currentGlob !== "" && !foundMatch) {
-				util.logError(
+				util.logInfo(
 					`For glob ${glob}, key ${key} must have value of ${value}')`
 				);
 			}
@@ -171,7 +171,7 @@ export function ensureEditorconfigKeyNotSet(
 
 		if (currentGlob == glob) {
 			if (line.includes(key)) {
-				util.logError(
+				util.logInfo(
 					`For glob ${glob}, key ${key} must be unset. (not even set to the value 'unset')`
 				);
 			}

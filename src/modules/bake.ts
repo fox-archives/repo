@@ -11,7 +11,7 @@ export const onFiles = [
 			const text = await Deno.readTextFile(entry.path);
 			for (const line of text.split("\n")) {
 				if (line.includes("task.fmt()")) {
-					util.logError("Use task.format() instead of task.fmt()");
+					util.logInfo("Use task.format() instead of task.fmt()");
 				}
 			}
 		},

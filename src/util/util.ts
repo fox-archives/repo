@@ -11,41 +11,45 @@ export function logError(msg: string) {
 	console.error(`Error: ${msg}`);
 }
 
+export function logInfo(msg: string) {
+	console.log("  - " + msg);
+}
+
 export function printLineError(
 	row: number,
 	column: number,
 	rule: string,
 	ruleReason: string
 ) {
-	logError(`${rule}: ${ruleReason} (row ${row}, column ${column})`);
+	logInfo(`${rule}: ${ruleReason} (row ${row}, column ${column})`);
 }
 
 export function logMissingProperty(property: string) {
-	logError(`There should be a '${property}' property`);
+	logInfo(`There should be a '${property}' property`);
 }
 
 export function logWrongPropertyValue(
 	property: string,
 	value: string | number | boolean
 ) {
-	logError(`There should be a '${property}' property with a value of ${value}`);
+	logInfo(`There should be a '${property}' property with a value of ${value}`);
 }
 
 export function ensureNotEmpty(property: string, value: string) {
 	if (value === null) {
-		logError(`The '${property}' property should not be null`);
+		logInfo(`The '${property}' property should not be null`);
 	} else if (typeof value === "object") {
 		if (Object.keys(value).length === 0) {
-			logError(`The '${property}' property should not be an empty object`);
+			logInfo(`The '${property}' property should not be an empty object`);
 		}
 	} else if (Array.isArray(value)) {
-		logError(`The '${property}' property should not be an empty array`);
+		logInfo(`The '${property}' property should not be an empty array`);
 	} else if (typeof value === "string") {
 		if (value.trim() === "") {
-			logError(`The '${property}' property should not be empty`);
+			logInfo(`The '${property}' property should not be empty`);
 		}
 	} else {
-		logError(`The type for '${property}' is unaccounted for`);
+		logInfo(`The type for '${property}' is unaccounted for`);
 	}
 }
 

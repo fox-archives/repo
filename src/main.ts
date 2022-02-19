@@ -110,7 +110,12 @@ const opts: util.Opts = {
 					for (const file of trigger.files) {
 						if (file === entry.name) {
 							modules[moduleName].push(async () => {
-								console.log(`File ./${path.relative(Deno.cwd(), entry.path)}`);
+								console.log(
+									`${c.underline("File")} ./${path.relative(
+										Deno.cwd(),
+										entry.path
+									)}`
+								);
 								await trigger.fn(opts, entry);
 							});
 						}

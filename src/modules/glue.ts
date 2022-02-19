@@ -8,7 +8,7 @@ export const onFiles = [
 	{
 		files: ["glue.toml"],
 		fn(opts: util.Opts, entry: fs.WalkEntry) {
-			util.logError(`File ${entry.path} should not exist`);
+			util.logInfo(`File ${entry.path} should not exist`);
 		},
 	},
 ];
