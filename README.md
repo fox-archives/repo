@@ -4,16 +4,23 @@ Foxomate automates tasks for Edwin the _fox_!
 
 Right now, it lints for the following:
 
-- Ensures [Bakefiles](https://github.com/hyperupcall/bake) have consistent naming
-- Ensures [basalt.toml](https://github.com/hyperupcall/basalt) files have all keys
-- Ensures `deno.json` files have my preferred configuration
-- Ensures `.editorconfig` files have my preferred configuration
-- Ensures `.gitattributes` files have my preferred configuration
-- Ensures `.prettierrc.json` files have my preferred configuration
+- [Bakefiles](https://github.com/hyperupcall/bake)
+  - `Bakefile.sh`
+- [Basalt](https://github.com/hyperupcall/basalt)
+  - `basalt.toml`
+- Bash and POSIX Shell
+  - `.{sh,bash}`
+- Deno
+  - `deno.json`
+- EditorConfig
+  - `.editorconfig`
+- Git
+  - `.gitattributes`
+- Glue
+  - `.glue`, `glue.toml`
+- License (TODO)
+- Prettier
+  `.prettierrc.json`
+- ShellCheck (TODO)
 
-## TODO
-
-- Have `--autofix` flag (dont' fix by default)
-- `.foxomateignore`
-- Make a proper CLI
-- Make it better
+Everything is supposed to be super hacky
