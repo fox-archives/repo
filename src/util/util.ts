@@ -1,5 +1,5 @@
 export type Opts = {
-	fix: "no" | "prompt" | "auto";
+	fix: "no" | "prompt" | "yes";
 };
 
 export function die(msg: string) {
@@ -53,8 +53,11 @@ export function ensureNotEmpty(property: string, value: string) {
 	}
 }
 
-export async function writeFile(path: string | URL, text: string) {
-	// if (globalThis.opts.shouldWrite) {
-	await Deno.writeTextFile(path, text);
-	// }
+export async function writeFile(opts: Opts, path: string | URL, text: string) {
+	if (opts.fix === "prompt") {
+		console.info("Prompting to overwrite not implemented");
+		// await Deno.writeTextFile(path, text);
+	} else if (opts.fix === "yes") {
+		await Deno.writeTextFile(path, text);
+	}
 }

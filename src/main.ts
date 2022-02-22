@@ -8,26 +8,34 @@ interface Module {
 	description: string;
 	init?: (opts?: util.Opts) => void;
 	onFiles?: Array<{
-		files: string[];
+		files: string[] | RegExp | ((arg0: string) => boolean);
 		fn: (opts: util.Opts, entry: fs.WalkEntry) => void;
 	}>;
 }
 
 // Declare main data
 const modules: {
-	[key: string]: Array<() => void>;
+	[key: string]: {
+		init?: Module["init"];
+		fns: Array<() => void>;
+	};
 } = {};
-for (const module of [
+
+for (const moduleName of [
 	"bake",
 	"basalt",
+	"bash",
 	"deno",
 	"editorconfig",
 	"git",
 	"glue",
+	"license",
 	"prettier",
 	"shellcheck",
 ]) {
-	modules[module] = [];
+	modules[moduleName] = {
+		fns: [],
+	};
 }
 
 // Argument parsing
@@ -44,7 +52,7 @@ const opts: util.Opts = {
 
 	Flags:
 	  --help
-	  --fix=no|prompt|auto
+	  --fix=no|prompt|yes
 
 	Modules:
 	${Object.keys(modules)
@@ -67,20 +75,24 @@ const opts: util.Opts = {
 {
 	for await (const entry of fs.expandGlob("**/*", {
 		exclude: [
-			"bower_components",
-			"node_modules",
-			"jspm_packages",
-			"web_modules",
-			".next",
-			".nuxt",
-			".yarn",
-			".dynamodb",
-			".fusebox",
-			".serverless",
-			"out",
-			"dist",
-			".cache",
-			"third_party",
+			// TODO: fix
+			"**/bower_components/**",
+			"**/node_modules/**",
+			"**/jspm_packages/**",
+			"**/web_modules/**",
+			"**/.next/**",
+			"**/.nuxt/**",
+			"**/.yarn/**",
+			"**/.dynamodb/**",
+			"**/.fusebox/**",
+			"**/.serverless/**",
+			"**/out/**",
+			"**/dist/**",
+			"**/.cache/**",
+			"**/.hidden/**",
+			".hidden",
+			"**/vendor/**",
+			"**/third_party/**",
 		],
 	})) {
 		for (const moduleName of Object.keys(modules)) {
@@ -91,33 +103,40 @@ const opts: util.Opts = {
 			if (!shouldRunModule(moduleName)) {
 				continue;
 			}
-			const module: Module = await import(`./modules/${moduleName}.ts`);
-			if (module.init && modules[moduleName].length === 0) {
-				modules[moduleName].push(async () => {
-					console.log(
-						`${c.magenta("Running init for module")}Running init for module ${
-							module.name
-						}`
-					);
 
-					if (!module.init) return;
-					await module.init(opts);
-				});
-			}
+			const module: Module = await import(`./modules/${moduleName}.ts`);
+			modules[moduleName].init = module.init;
 
 			if (module.onFiles) {
+				const add = (trigger: typeof module.onFiles[0], moduleName: string) => {
+					modules[moduleName].fns.push(async () => {
+						console.log(
+							`${c.underline("File")} ./${path.relative(
+								Deno.cwd(),
+								entry.path
+							)}`
+						);
+						await trigger.fn(opts, entry);
+					});
+				};
+
 				for (const trigger of module.onFiles) {
-					for (const file of trigger.files) {
-						if (file === entry.name) {
-							modules[moduleName].push(async () => {
-								console.log(
-									`${c.underline("File")} ./${path.relative(
-										Deno.cwd(),
-										entry.path
-									)}`
-								);
-								await trigger.fn(opts, entry);
-							});
+					if (Array.isArray(trigger.files)) {
+						for (const file of trigger.files) {
+							if (file === entry.name) {
+								add(trigger, moduleName);
+							}
+						}
+					} else if (trigger.files instanceof RegExp) {
+						if (trigger.files.test(entry.name)) {
+							add(trigger, moduleName);
+						}
+					} else if (
+						typeof trigger.files === "function" &&
+						trigger.files !== null
+					) {
+						if (trigger.files(entry.path)) {
+							add(trigger, moduleName);
 						}
 					}
 				}
@@ -128,11 +147,14 @@ const opts: util.Opts = {
 
 // Run modules
 {
-	for (const [moduleName, module] of Object.entries(modules)) {
-		if (module.length === 0) continue;
+	for (const [mName, { fns, init }] of Object.entries(modules)) {
+		console.log(`Module ${c.underline(c.magenta(mName))}`);
 
-		console.log(`Module ${c.underline(c.magenta(moduleName))}`);
-		for (const fn of module) {
+		if (typeof init === "function" && init !== null) {
+			await init(opts);
+		}
+
+		for (const fn of fns) {
 			await fn();
 		}
 		console.log();

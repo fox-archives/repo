@@ -8,6 +8,9 @@ function hasFoxomateDeclaration(line: string, value = "") {
 
 export const name = "Git";
 export const description = "Checks .gitattributes file";
+export const init = async () => {
+	await fs.ensureFile(".gitattributes");
+};
 export const onFiles = [
 	{
 		files: [".gitattributes"],
@@ -19,6 +22,16 @@ export const onFiles = [
 
 			let foxomateStart = false;
 			for (const line of text.split("\n")) {
+				if (line.includes("glue")) {
+					util.logInfo(
+						"Should not have any references to 'glue' in Gitattributes file"
+					);
+				}
+
+				if (line === "* text=auto") {
+					util.logInfo("Please use '* text=auto eol=lf");
+				}
+
 				if (hasFoxomateDeclaration(line, "start")) {
 					foxomateStart = true;
 					continue;
@@ -51,7 +64,7 @@ export const onFiles = [
 			}
 
 			const newlines = Array.prototype.concat(linesFoxomate).concat(linesOther);
-			await Deno.writeTextFile(entry.path, newlines.join("\n"));
+			await util.writeFile(opts, entry.path, newlines.join("\n"));
 		},
 	},
 ];

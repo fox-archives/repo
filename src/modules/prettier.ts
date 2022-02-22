@@ -93,8 +93,9 @@ function prettierLint(path: string, json: Record<string, any>) {
 		util.logInfo("Expected 5 entries in prettiercfg");
 	}
 
-	if (json.tabWidth !== 3) {
-		util.logInfo("tabWidth should be '3'");
+	if (json.tabWidth) {
+		// tabWidth actually effects things besides alignment
+		util.logInfo("tabWidth should not be set");
 	}
 
 	if (!json.useTabs) {
