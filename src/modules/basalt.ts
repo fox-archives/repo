@@ -3,8 +3,6 @@ import { toml } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 
-// TODO: test to ensure the following do or do not have || exit prepended
-
 export const name = "Basalt";
 export const description = "Lints basalt.toml files";
 export const onFiles = [
