@@ -1,3 +1,5 @@
+import { moduleNames } from "../subcommands/fix.ts";
+
 export type Opts = {
 	fix: "no" | "prompt" | "yes";
 };
@@ -60,4 +62,23 @@ export async function writeFile(opts: Opts, path: string | URL, text: string) {
 	} else if (opts.fix === "yes") {
 		await Deno.writeTextFile(path, text);
 	}
+}
+
+export function showHelp() {
+	console.log(`foxomate
+
+Summary: Task automater and general linter
+
+Usage: foxomate [flags] [subcommand]
+
+Subcommands:
+  init [--lang=<lang>]
+
+  fix [--fix=no|prompt|yes] [modules ...]
+
+Flags:
+  --help
+
+Modules:
+  - ${moduleNames.join(",")}`);
 }
