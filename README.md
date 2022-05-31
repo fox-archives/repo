@@ -1,26 +1,21 @@
-# foxomate
+# fox
 
-Foxomate automates tasks for Edwin the _fox_!
+Fox inits, lints, and releases projects
 
-Right now, it lints for the following:
+## init
 
-- [Bakefiles](https://github.com/hyperupcall/bake)
-  - `Bakefile.sh`
-- [Basalt](https://github.com/hyperupcall/basalt)
-  - `basalt.toml`
-- Bash and POSIX Shell
-  - `.{sh,bash}`
-- Deno
-  - `deno.json`
-- EditorConfig
-  - `.editorconfig`
-- Git
-  - `.gitattributes`
-- Glue
-  - `.glue`, `glue.toml`
-- License (TODO)
-- Prettier
-  `.prettierrc.json`
-- ShellCheck (TODO)
+Initializes a new project in directory for a particular language or framework
 
-Everything is supposed to be super hacky
+- `fox init <lang-or-framework> [dir]`
+
+## lint
+
+Lints current language or framework. This isn't a typical lint, however. This step lints configuration, like other linting configs, formatting configs, EditorConfig files, etc.
+
+- `fox lint`
+
+## release
+
+Make a release for a particular language or framework
+
+- `fox release [version]`

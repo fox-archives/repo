@@ -1,11 +1,14 @@
-import { moduleNames } from "../subcommands/fix.ts";
+import { moduleNames } from "../subcommands/lint.ts";
+
+import { fs, toml, Ajv, z } from "../deps.ts";
+import { FoxConfig, FoxConfigSchema } from "../types.ts";
 
 export type Opts = {
 	fix: "no" | "prompt" | "yes";
 };
 
-export function die(msg: string) {
-	logError(msg);
+export function die(msg: string): never {
+	logError(`${msg}. Exiting`);
 	Deno.exit(1);
 }
 
@@ -74,7 +77,9 @@ Usage: foxomate [flags] [subcommand]
 Subcommands:
   init [--lang=<lang>]
 
-  fix [--fix=no|prompt|yes] [modules ...]
+  lint [--fix=no|prompt|yes] [modules ...]
+
+  release [version]
 
 Flags:
   --help
@@ -84,7 +89,7 @@ Modules:
 }
 
 export async function run(args: string[]): Promise<void> {
-	const process = Deno.util.run({
+	const process = Deno.run({
 		cmd: args,
 	});
 	const status = await process.status();
@@ -92,4 +97,86 @@ export async function run(args: string[]): Promise<void> {
 	if (!status.success) {
 		Deno.exit(1);
 	}
+}
+
+export async function arrayFromAsync<T>(asyncItems: AsyncIterable<T>) {
+	const arr = [];
+	for await (const item of asyncItems) {
+		arr.push(await item);
+	}
+	return arr;
+}
+
+export async function determineFoxConfig(): Promise<FoxConfig> {
+	const attemptParse = async (
+		fn: () => Promise<Record<string, unknown>>
+	): Promise<Record<string, unknown> | undefined> => {
+		try {
+			const content = await fn();
+			return content;
+		} catch (err: unknown) {
+			if (!(err instanceof Error)) die("Failed");
+
+			if (err instanceof Deno.errors.NotFound) {
+				return undefined;
+			} else {
+				throw err;
+			}
+		}
+	};
+
+	const toFoxConfig = (obj: Record<string, unknown>): FoxConfig => {
+		// const schema = {
+		// 	type: "object",
+		// 	additionalProperties: false,
+		// 	properties: {
+		// 		ecosystem: {
+		// 			type: "string",
+		// 		},
+		// 		variant: {
+		// 			type: "string",
+		// 		},
+		// 	},
+		// };
+		// const ajv = new Ajv.Ajv();
+		// const validate = ajv.compile(schema);
+		// const valid = validate(obj);
+		// if (!valid) {
+		// 	console.error("Validation error");
+		// 	throw new Error(validate.errors);
+		// }
+
+		const data = FoxConfigSchema.safeParse(obj);
+		if (!data.success) {
+			console.error(data.error.issues);
+			die("Schema validation failed");
+		}
+
+		return obj as FoxConfig;
+	};
+
+	for (const result of await Promise.allSettled([
+		attemptParse(async () => {
+			const content = await Deno.readTextFile("./fox.json");
+			const contentJson = JSON.parse(content) as unknown;
+			if (typeof contentJson !== "object" || contentJson === null) {
+				throw new Error("Top level not a JSON object");
+			}
+			return contentJson as Record<string, unknown>;
+		}),
+		attemptParse(async () => {
+			const content = await Deno.readTextFile("./fox.toml");
+			return toml.parse(content);
+		}),
+	])) {
+		if (result.status === "rejected") {
+			console.error("Promise failed"); // FIXME
+			die(result.reason);
+		}
+
+		if (!result.value) continue;
+		return toFoxConfig(result.value);
+	}
+
+	return toFoxConfig({});
 }

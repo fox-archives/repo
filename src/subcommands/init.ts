@@ -2,20 +2,12 @@ import { flags, fs, path } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 
-async function ArrayFromAsync<T>(asyncItems: AsyncIterable<T>) {
-	const arr = [];
-	for await (const item of asyncItems) {
-		arr.push(await item);
-	}
-	return arr;
-}
-
 function die(msg: string) {
 	console.error(`Error: ${msg}`);
 	Deno.exit(1);
 }
 
-export async function subcommandInit(args: flags.Args) {
+export async function foxInit(args: flags.Args) {
 	const projectDir = String(args._[1] || "");
 	const projectType = String(args._[2] || "");
 
@@ -46,7 +38,7 @@ export async function subcommandInit(args: flags.Args) {
 		}
 	}
 
-	if ((await ArrayFromAsync(Deno.readDir("."))).length !== 0) {
+	if ((await util.arrayFromAsync(Deno.readDir("."))).length !== 0) {
 		die("Project dir must be empty");
 	}
 
