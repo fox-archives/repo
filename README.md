@@ -4,18 +4,12 @@ Fox inits, lints, and releases projects
 
 ## init
 
-Initializes a new project in directory for a particular language or framework
-
-- `fox init <lang-or-framework> [dir]`
+Initializes a new project in directory for a particular ecosystem
 
 ## lint
 
-Lints current language or framework. This isn't a typical lint, however. This step lints configuration, like other linting configs, formatting configs, EditorConfig files, etc.
-
-- `fox lint`
+Lints the configuration of a particular ecosystem. For example, it may check to ensure `eslint-config-hyperupcall` is installed, used, and update to date for a NodeJS application
 
 ## release
 
-Make a release for a particular language or framework
-
-- `fox release [version]`
+Release a version for a particular ecosystem
