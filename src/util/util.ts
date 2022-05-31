@@ -82,3 +82,14 @@ Flags:
 Modules:
   - ${moduleNames.join(",")}`);
 }
+
+export async function run(args: string[]): Promise<void> {
+	const process = Deno.util.run({
+		cmd: args,
+	});
+	const status = await process.status();
+	process.close();
+	if (!status.success) {
+		Deno.exit(1);
+	}
+}
