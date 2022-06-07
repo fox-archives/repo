@@ -1,6 +1,6 @@
 import { flags, c, fs, path } from "../deps.ts";
 
-import { foxModules } from "../modules/index.ts";
+import { foxModules } from "../linters/index.ts";
 
 import * as types from "../types.ts";
 import * as util from "../util/util.ts";
