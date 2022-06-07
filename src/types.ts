@@ -3,6 +3,7 @@ import { fs, z } from "./deps.ts";
 import * as util from "./util/util.ts";
 
 export interface FixModule {
+	id: string;
 	name: string;
 	description: string;
 	init?: (opts?: util.Opts) => void;
@@ -27,7 +28,7 @@ export const FoxConfigSchema = z.object({
 	variant: z.literal("app").or(z.literal("lib")).optional(),
 });
 
-export type EcosystemType =
+export type ProjectEcosystem =
 	| "nodejs"
 	| "go"
 	| "deno"
@@ -36,9 +37,25 @@ export type EcosystemType =
 	| "basalt"
 	| "gradle";
 
-export type ProjectVariant = "app" | "lib";
+export type ProjectForm = "app" | "lib";
 
 export type FoxConfig = {
-	ecosystem: EcosystemType;
-	variant: ProjectVariant;
+	ecosystem?: ProjectEcosystem;
+	form?: ProjectForm;
+};
+
+export type FoxModule = {
+	name: string;
+	activateOn: {
+		ecosystem: string;
+		form: string;
+	};
+	match?: Map<string, (opts: ModuleOptions, entry: fs.WalkEntry) => void>;
+	triggers?: {
+		onInitial: (opts: ModuleOptions) => void;
+	};
+};
+
+export type ModuleOptions = {
+	fix?: "no" | "prompt" | "yes";
 };

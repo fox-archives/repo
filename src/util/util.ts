@@ -1,7 +1,6 @@
-import { moduleNames } from "../subcommands/lint.ts";
-
 import { fs, toml, Ajv, z } from "../deps.ts";
 import { FoxConfig, FoxConfigSchema } from "../types.ts";
+import * as types from "../types.ts";
 
 export type Opts = {
 	fix: "no" | "prompt" | "yes";
@@ -10,6 +9,14 @@ export type Opts = {
 export function die(msg: string): never {
 	logError(`${msg}. Exiting`);
 	Deno.exit(1);
+}
+
+export function assertInstanceOfError(err: unknown) {
+	if (!(err instanceof Error)) {
+		throw Error("assertInstanceOfError"); // TODO
+	}
+
+	return err;
 }
 
 export function logError(msg: string) {
@@ -58,7 +65,11 @@ export function ensureNotEmpty(property: string, value: string) {
 	}
 }
 
-export async function writeFile(opts: Opts, path: string | URL, text: string) {
+export async function writeFile(
+	opts: types.ModuleOptions,
+	path: string | URL,
+	text: string
+) {
 	if (opts.fix === "prompt") {
 		console.info("Prompting to overwrite not implemented");
 		// await Deno.writeTextFile(path, text);
@@ -85,7 +96,7 @@ Flags:
   --help
 
 Modules:
-  - ${moduleNames.join(",")}`);
+  - ${[].join(",")}`); // TODO
 }
 
 export async function run(args: string[]): Promise<void> {
@@ -99,6 +110,15 @@ export async function run(args: string[]): Promise<void> {
 	}
 }
 
+export async function hasPath(glob: string) {
+	let exists = false;
+	for await (const _entry of fs.expandGlob(glob)) {
+		exists = true;
+		break;
+	}
+	return exists;
+}
+
 export async function arrayFromAsync<T>(asyncItems: AsyncIterable<T>) {
 	const arr = [];
 	for await (const item of asyncItems) {
@@ -107,47 +127,11 @@ export async function arrayFromAsync<T>(asyncItems: AsyncIterable<T>) {
 	return arr;
 }
 
-export async function determineFoxConfig(): Promise<FoxConfig> {
-	const attemptParse = async (
-		fn: () => Promise<Record<string, unknown>>
-	): Promise<Record<string, unknown> | undefined> => {
-		try {
-			const content = await fn();
-			return content;
-		} catch (err: unknown) {
-			if (!(err instanceof Error)) die("Failed");
-
-			if (err instanceof Deno.errors.NotFound) {
-				return undefined;
-			} else {
-				throw err;
-			}
-		}
-	};
-
-	const toFoxConfig = (obj: Record<string, unknown>): FoxConfig => {
-		// const schema = {
-		// 	type: "object",
-		// 	additionalProperties: false,
-		// 	properties: {
-		// 		ecosystem: {
-		// 			type: "string",
-		// 		},
-		// 		variant: {
-		// 			type: "string",
-		// 		},
-		// 	},
-		// };
-		// const ajv = new Ajv.Ajv();
-		// const validate = ajv.compile(schema);
-		// const valid = validate(obj);
-		// if (!valid) {
-		// 	console.error("Validation error");
-		// 	throw new Error(validate.errors);
-		// }
-
+export async function getFoxConfig(): Promise<FoxConfig> {
+	const validateCfg = (obj: unknown) => {
 		const data = FoxConfigSchema.safeParse(obj);
 		if (!data.success) {
+			// TODO
 			console.error(data.error.issues);
 			die("Schema validation failed");
 		}
@@ -155,28 +139,25 @@ export async function determineFoxConfig(): Promise<FoxConfig> {
 		return obj as FoxConfig;
 	};
 
-	for (const result of await Promise.allSettled([
-		attemptParse(async () => {
-			const content = await Deno.readTextFile("./fox.json");
-			const contentJson = JSON.parse(content) as unknown;
-			if (typeof contentJson !== "object" || contentJson === null) {
-				throw new Error("Top level not a JSON object");
-			}
-			return contentJson as Record<string, unknown>;
-		}),
-		attemptParse(async () => {
-			const content = await Deno.readTextFile("./fox.toml");
-			return toml.parse(content);
-		}),
-	])) {
-		if (result.status === "rejected") {
-			console.error("Promise failed"); // FIXME
-			die(result.reason);
+	try {
+		const foxJson = await Deno.readTextFile("./fox.json");
+		return validateCfg(JSON.parse(foxJson));
+	} catch (errUnknown: unknown) {
+		const err = assertInstanceOfError(errUnknown);
+		if (!(err instanceof Deno.errors.NotFound)) {
+			throw err;
 		}
-
-		if (!result.value) continue;
-		return toFoxConfig(result.value);
 	}
 
-	return toFoxConfig({});
+	try {
+		const foxToml = await Deno.readTextFile("./fox.toml");
+		return validateCfg(toml.parse(foxToml));
+	} catch (errUnknown: unknown) {
+		const err = assertInstanceOfError(errUnknown);
+		if (!(err instanceof Deno.errors.NotFound)) {
+			throw err;
+		}
+	}
+
+	return validateCfg({});
 }

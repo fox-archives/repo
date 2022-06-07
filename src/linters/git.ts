@@ -1,21 +1,21 @@
 import { fs } from "../deps.ts";
 
 import * as util from "../util/util.ts";
+import * as types from "../types.ts";
 
-function hasFoxomateDeclaration(line: string, value = "") {
-	return line.match(new RegExp(`^(?:#|//)[ \t]*foxomate[ \t]*${value}`));
-}
+export default {
+	id: "git",
+	name: "Git",
+	activateOn: {
+		ecosystem: "ALL",
+		form: "ALL",
+	},
+	triggers: {
+		async onInitial(opts: types.ModuleOptions) {
+			await fs.ensureFile(".gitattributes");
 
-export const name = "Git";
-export const description = "Checks .gitattributes file";
-export const init = async () => {
-	await fs.ensureFile(".gitattributes");
-};
-export const onFiles = [
-	{
-		files: [".gitattributes"],
-		async fn(opts: util.Opts, entry: fs.WalkEntry) {
-			const text = await Deno.readTextFile(entry.path);
+			// TODO: sort all gitattributes, but only foxomate start the root one
+			const text = await Deno.readTextFile(".gitattributes");
 
 			let linesFoxomate = [];
 			const linesOther = [];
@@ -64,7 +64,11 @@ export const onFiles = [
 			}
 
 			const newlines = Array.prototype.concat(linesFoxomate).concat(linesOther);
-			await util.writeFile(opts, entry.path, newlines.join("\n"));
+			await util.writeFile(opts, ".gitattributes", newlines.join("\n"));
 		},
 	},
-];
+};
+
+function hasFoxomateDeclaration(line: string, value = "") {
+	return line.match(new RegExp(`^(?:#|//)[ \t]*foxomate[ \t]*${value}`));
+}
