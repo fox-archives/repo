@@ -12,9 +12,23 @@ export default {
 	},
 	triggers: {
 		async onInitial(opts: types.ModuleOptions) {
-			// TODO
-			// await Deno.remove("glue.toml");
-			// await Deno.remove(".glue");
+			try {
+				await Deno.remove("glue.toml");
+			} catch (unknownError: unknown) {
+				const err = util.assertInstanceOfError(unknownError);
+				if (!(err instanceof Deno.errors.NotFound)) {
+					throw err;
+				}
+			}
+
+			try {
+				await Deno.remove(".glue", { recursive: true });
+			} catch (unknownError: unknown) {
+				const err = util.assertInstanceOfError(unknownError);
+				if (!(err instanceof Deno.errors.NotFound)) {
+					throw err;
+				}
+			}
 		},
 	},
 };

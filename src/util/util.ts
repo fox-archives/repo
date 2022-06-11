@@ -1,10 +1,6 @@
-import { fs, toml, Ajv, z } from "../deps.ts";
+import { fs, toml } from "../deps.ts";
 import { FoxConfig, FoxConfigSchema } from "../types.ts";
 import * as types from "../types.ts";
-
-export type Opts = {
-	fix: "no" | "prompt" | "yes";
-};
 
 export function die(msg: string): never {
 	logError(`${msg}. Exiting`);
@@ -25,26 +21,6 @@ export function logError(msg: string) {
 
 export function logInfo(msg: string) {
 	console.log("  - " + msg);
-}
-
-export function printLineError(
-	row: number,
-	column: number,
-	rule: string,
-	ruleReason: string
-) {
-	logInfo(`${rule}: ${ruleReason} (row ${row}, column ${column})`);
-}
-
-export function logMissingProperty(property: string) {
-	logInfo(`There should be a '${property}' property`);
-}
-
-export function logWrongPropertyValue(
-	property: string,
-	value: string | number | boolean
-) {
-	logInfo(`There should be a '${property}' property with a value of ${value}`);
 }
 
 export function ensureNotEmpty(property: string, value: string) {
@@ -90,6 +66,8 @@ Subcommands:
 
   lint [--fix=no|prompt|yes] [modules ...]
 
+  docgen
+
   release [version]
 
 Flags:
@@ -108,6 +86,35 @@ export async function run(args: string[]): Promise<void> {
 	if (!status.success) {
 		Deno.exit(1);
 	}
+}
+
+export async function exec(
+	args: Omit<Deno.RunOptions, "stdin" | "stdout" | "stderr">
+) {
+	const p = Deno.run({
+		cmd: args.cmd,
+		cwd: args.cwd,
+		env: args.env,
+		stdin: "null",
+		stdout: "piped",
+		stderr: "piped",
+	});
+	const [status, stdout, stderr] = await Promise.all([
+		p.status(),
+		p.output(),
+		p.stderrOutput(),
+	]);
+	p.close();
+	if (!status.success) {
+		// TODO
+		throw new Error("Failed to execute process");
+	}
+
+	return {
+		status: status,
+		stdout: new TextDecoder().decode(stdout),
+		stderr: new TextDecoder().decode(stderr),
+	};
 }
 
 export async function hasPath(glob: string) {

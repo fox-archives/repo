@@ -6,10 +6,10 @@ export interface FixModule {
 	id: string;
 	name: string;
 	description: string;
-	init?: (opts?: util.Opts) => void;
+	init?: (opts?: ModuleOptions) => void;
 	onFiles?: Array<{
 		files: string[] | RegExp | ((arg0: string) => boolean);
-		fn: (opts: util.Opts, entry: fs.WalkEntry) => void;
+		fn: (opts: ModuleOptions, entry: fs.WalkEntry) => void;
 	}>;
 }
 
@@ -58,4 +58,11 @@ export type FoxModule = {
 
 export type ModuleOptions = {
 	fix?: "no" | "prompt" | "yes";
+};
+
+export type Context = {
+	dir: string;
+	owner: string | null;
+	repo: string | null;
+	github_token: string;
 };

@@ -6,7 +6,7 @@ import * as types from "../types.ts";
 import * as util from "../util/util.ts";
 import * as project from "../util/project.ts";
 
-export async function foxLint(args: flags.Args) {
+export async function foxLint(ctx: types.Context, args: flags.Args) {
 	const foxConfig = await util.getFoxConfig();
 
 	const ecosystem = await project.determineEcosystem(".");

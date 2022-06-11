@@ -1,4 +1,4 @@
-import { fs, toml } from "../deps.ts";
+import { fs, toml, conversion } from "../deps.ts";
 import * as util from "./util.ts";
 import { ProjectForm, ProjectEcosystem, FoxConfig } from "../types.ts";
 
@@ -68,4 +68,25 @@ export async function determineForm(
 			break;
 		}
 	}
+}
+
+export async function getGitInfo(): Promise<{
+	repoName: string;
+}> {
+	const p = await Deno.run({
+		cmd: ["git", "remote", "get-url", "origin"],
+		stdout: "piped",
+	});
+	const status = await p.status();
+	if (!status.success) {
+		Deno.exit(1);
+	}
+	const content = new TextDecoder().decode(await conversion.readAll(p.stdout));
+	const repoName = content.split("/").at(-1);
+	if (!repoName) {
+		util.die("Failed to determine repoName");
+	}
+	return {
+		repoName,
+	};
 }

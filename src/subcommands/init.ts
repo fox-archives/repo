@@ -1,21 +1,17 @@
 import { flags, fs, path } from "../deps.ts";
 
 import * as util from "../util/util.ts";
+import * as types from "../types.ts";
 
-function die(msg: string) {
-	console.error(`Error: ${msg}`);
-	Deno.exit(1);
-}
-
-export async function foxInit(args: flags.Args) {
+export async function foxInit(ctx: types.Context, args: flags.Args) {
 	const projectDir = String(args._[1] || "");
 	const projectType = String(args._[2] || "");
 
 	if (!projectDir) {
-		die("Failed to specify project directory");
+		util.die("Failed to specify project directory");
 	}
 	if (!/(?:(?:-|[[:alnum:]])+|\.)/.test(projectDir)) {
-		die("Failed to match directory regex");
+		util.die("Failed to match directory regex");
 	}
 	if (!projectType) {
 		console.log(`Failed to specify project type`);
@@ -27,7 +23,7 @@ export async function foxInit(args: flags.Args) {
 		Deno.chdir(projectDir);
 	} catch (err: unknown) {
 		if (!(err instanceof Error)) {
-			die("Unexpected");
+			util.die("Unexpected");
 		}
 
 		if (err instanceof Deno.errors.NotFound) {
@@ -39,7 +35,7 @@ export async function foxInit(args: flags.Args) {
 	}
 
 	if ((await util.arrayFromAsync(Deno.readDir("."))).length !== 0) {
-		die("Project dir must be empty");
+		util.die("Project dir must be empty");
 	}
 
 	const username = "hyperupcall";
@@ -59,7 +55,9 @@ export async function foxInit(args: flags.Args) {
 			break;
 		case "go":
 		case "golang":
-			util.run(["go", "mod", "init", `github.com/${username}/${repoName}`]);
+			util.exec({
+				cmd: ["go", "mod", "init", `github.com/${username}/${repoName}`],
+			});
 			await Deno.writeTextFile(
 				"main.go",
 				`package main
@@ -70,7 +68,7 @@ func main() {
 			);
 			break;
 		default:
-			die("Not supported projectType");
+			util.die("Not supported projectType");
 			break;
 	}
 
@@ -79,18 +77,20 @@ func main() {
 	if (await fs.exists(".git")) {
 		console.log("Info: Already have git directory. Skipping Git init stuff");
 	} else {
-		await util.run(["git", "init"]);
+		await util.exec({ cmd: ["git", "init"] });
 
-		await util.run([
-			"git",
-			"remote",
-			"add",
-			"origin",
-			`git@github.com:${username}/${repoName}`,
-		]);
+		await util.exec({
+			cmd: [
+				"git",
+				"remote",
+				"add",
+				"origin",
+				`git@github.com:${username}/${repoName}`,
+			],
+		});
 
-		await util.run(["git", "add", "-A"]);
-		await util.run(["git", "commit", "-m", "chore: Initial commit"]);
+		await util.exec({ cmd: ["git", "add", "-A"] });
+		await util.exec({ cmd: ["git", "commit", "-m", "chore: Initial commit"] });
 	}
 
 	await Deno.writeTextFile(
@@ -100,7 +100,7 @@ task.build() {
 	:
 }
 
-task.util.run() {
+task.util.exec() {
 	:
 }
 
@@ -112,10 +112,10 @@ task.release() {
 	:
 }\n`
 	);
-	await util.run(["bake"]);
+	await util.exec({ cmd: ["bake"] });
 
 	await Deno.writeTextFile("README.md", `${repoName}\n`);
 
-	await util.run(["gh", "repo", "create", repoName, "--public"]);
-	await util.run(["git", "push", "-u", "origin", "main"]);
+	await util.exec({ cmd: ["gh", "repo", "create", repoName, "--public"] });
+	await util.exec({ cmd: ["git", "push", "-u", "origin", "main"] });
 }
