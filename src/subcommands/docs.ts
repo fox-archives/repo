@@ -5,13 +5,12 @@ import * as util from "../util/util.ts";
 import * as project from "../util/project.ts";
 
 export async function foxDocs(ctx: types.Context, args: flags.Args) {
-	const gitInfo = await project.getGitInfo();
-	const apiRepoUrl = `https://api.github.com/repos/${ctx.owner}/${gitInfo.repoName}`;
+	const apiRepoUrl = `https://api.github.com/repos/${ctx.owner}/${ctx.repo}`;
 
 	const mkdocsYml = {
 		site_name: "dotfox",
-		site_url: `https://${ctx.owner}.github.io/${gitInfo.repoName}`,
-		repo_url: `https://github.com/${ctx.owner}/${gitInfo.repoName}`,
+		site_url: `https://${ctx.owner}.github.io/${ctx.repo}`,
+		repo_url: `https://github.com/${ctx.owner}/${ctx.repo}`,
 		// repo_name
 		// edit_uri
 		site_description: "",
@@ -123,7 +122,7 @@ export async function foxDocs(ctx: types.Context, args: flags.Args) {
 				authorization: `token ${ctx.github_token}`,
 			},
 			body: JSON.stringify({
-				homepage: `https://${ctx.owner}.github.io/${gitInfo.repoName}`,
+				homepage: `https://${ctx.owner}.github.io/${ctx.repo}`,
 			}),
 		});
 		if (!res.ok) {

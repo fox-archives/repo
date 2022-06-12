@@ -59,34 +59,15 @@ export async function determineForm(
 				await Deno.readTextFile(EcosystemFiles.basaltToml)
 			);
 
-			if (content["type"] === "app") {
+			const type = (content as any)?.package?.type;
+
+			if (type === "app") {
 				return "app";
-			} else if (content["type"] === "lib") {
+			} else if (type === "lib") {
 				return "lib";
 			}
 
 			break;
 		}
 	}
-}
-
-export async function getGitInfo(): Promise<{
-	repoName: string;
-}> {
-	const p = await Deno.run({
-		cmd: ["git", "remote", "get-url", "origin"],
-		stdout: "piped",
-	});
-	const status = await p.status();
-	if (!status.success) {
-		Deno.exit(1);
-	}
-	const content = new TextDecoder().decode(await conversion.readAll(p.stdout));
-	const repoName = content.split("/").at(-1);
-	if (!repoName) {
-		util.die("Failed to determine repoName");
-	}
-	return {
-		repoName,
-	};
 }

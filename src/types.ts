@@ -66,3 +66,8 @@ export type Context = {
 	repo: string | null;
 	github_token: string;
 };
+
+export type LintRule = {
+	name: string;
+	description: string;
+};
