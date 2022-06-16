@@ -79,13 +79,20 @@ export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
 		{ allowFailure: true }
 	);
 
+	let remoteUrl = result.stdout.trim();
+	if (remoteUrl.endsWith(".git")) {
+		remoteUrl = remoteUrl.slice(0, remoteUrl.lastIndexOf(".git"));
+		await exec({
+			cmd: ["git", "remote", "set-url", "origin", remoteUrl],
+		});
+	}
+
 	if (result.status.success) {
-		if (result.stdout.includes("@")) {
+		if (remoteUrl.includes("@")) {
 			// SSH
-			const match =
-				/git@(?<site>.+?):(?<owner>.+?)\/(?<repo>.+?(?=.git))/u.exec(
-					result.stdout
-				);
+			const match = /git@(?<site>.+?):(?<owner>.+?)\/(?<repo>.+)/u.exec(
+				remoteUrl
+			);
 
 			const groups = match?.groups || {};
 			if ("site" in groups && "owner" in groups && "repo" in groups) {
@@ -97,12 +104,11 @@ export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
 			} else {
 				die("Failed to extract info from remote url");
 			}
-		} else if (result.stdout.includes("http")) {
+		} else if (remoteUrl.includes("http")) {
 			// HTTPS
-			const match =
-				/https?:\/\/(?<site>.+?)\/(?<owner>.+?)\/(?<repo>.+?(?=.git))/u.exec(
-					result.stdout
-				);
+			const match = /https?:\/\/(?<site>.+?)\/(?<owner>.+?)\/(?<repo>.+)/u.exec(
+				remoteUrl
+			);
 
 			const groups = match?.groups || {};
 			if ("site" in groups && "owner" in groups && "repo" in groups) {
