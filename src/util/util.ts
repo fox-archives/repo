@@ -83,7 +83,7 @@ export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
 		if (result.stdout.includes("@")) {
 			// SSH
 			const match =
-				/git@(?<site>.*?):(?<owner>.*?)\/(?<repo>.*)(?:.git)?/u.exec(
+				/git@(?<site>.+?):(?<owner>.+?)\/(?<repo>.+?(?=.git))/u.exec(
 					result.stdout
 				);
 
@@ -100,7 +100,7 @@ export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
 		} else if (result.stdout.includes("http")) {
 			// HTTPS
 			const match =
-				/https?:\/\/(?<site>.*?)\/(?<owner>.*?)\/(?<repo>.*)(?:.git)?/u.exec(
+				/https?:\/\/(?<site>.+?)\/(?<owner>.+?)\/(?<repo>.+?(?=.git))/u.exec(
 					result.stdout
 				);
 
