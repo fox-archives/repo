@@ -2,12 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://hyperupcall.github.io/foxxy/</loc>
-         <lastmod>2022-06-12</lastmod>
+         <lastmod>2022-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hyperupcall.github.io/foxxy/concepts/</loc>
-         <lastmod>2022-06-12</lastmod>
+         <lastmod>2022-06-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hyperupcall.github.io/foxxy/motivation/</loc>
+         <lastmod>2022-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
