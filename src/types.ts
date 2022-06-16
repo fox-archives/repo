@@ -1,48 +1,105 @@
 import { fs, z } from "./deps.ts";
 
-import * as util from "./util/util.ts";
+/* ----------------------- Context ---------------------- */
 
-export interface FixModule {
-	id: string;
-	name: string;
-	description: string;
-	init?: (opts?: ModuleOptions) => void;
-	onFiles?: Array<{
-		files: string[] | RegExp | ((arg0: string) => boolean);
-		fn: (opts: ModuleOptions, entry: fs.WalkEntry) => void;
-	}>;
-}
+export type Context = {
+	dir: string;
+	ecosystem: ProjectEcosystem;
+	form: ProjectForm;
+	owner: {
+		username: string;
+		fullname: string;
+		email: string;
+		website: string;
+	};
+	repo: string;
+	github_token: string;
+};
 
-export const FoxConfigSchema = z.object({
-	ecosystem: z
-		.union([
-			z.literal("nodejs"),
-			z.literal("go"),
-			z.literal("deno"),
-			z.literal("rust"),
-			z.literal("nim"),
-			z.literal("basalt"),
-			z.literal("gradle"),
-		])
-		.optional(),
-	variant: z.literal("app").or(z.literal("lib")).optional(),
-});
+/* --------------- Fox Configuration File --------------- */
 
 export type ProjectEcosystem =
+	| "node"
 	| "nodejs"
 	| "go"
+	| "golang"
 	| "deno"
 	| "rust"
 	| "nim"
 	| "basalt"
 	| "gradle";
+export const ProjectEcosystemSchema = z.union([
+	z.literal("node"),
+	z.literal("nodejs"),
+	z.literal("go"),
+	z.literal("golang"),
+	z.literal("deno"),
+	z.literal("rust"),
+	z.literal("nim"),
+	z.literal("basalt"),
+	z.literal("gradle"),
+]);
 
 export type ProjectForm = "app" | "lib";
+export const ProjectFormSchema = z.union([z.literal("app"), z.literal("lib")]);
 
-export type FoxConfig = {
+export type FoxConfigProject = {
 	ecosystem?: ProjectEcosystem;
 	form?: ProjectForm;
 };
+export const FoxConfigProjectSchema = {
+	type: "object",
+	additionalProperties: false,
+	properties: {
+		ecosystem: {
+			type: "string",
+		},
+		form: {
+			type: "string",
+		},
+	},
+};
+
+export type FoxConfigGlobal = {
+	owner: {
+		username: string;
+		fullname: string;
+		email: string;
+		website: string;
+	};
+	github_token: string;
+};
+export const FoxConfigGlobalSchema = {
+	type: "object",
+	additionalProperties: false,
+	required: ["owner", "github_token"],
+	properties: {
+		owner: {
+			type: "object",
+			additionalProperties: false,
+			required: ["username", "fullname", "email", "website"],
+			properties: {
+				username: {
+					type: "string",
+				},
+				fullname: {
+					type: "string",
+				},
+				email: {
+					type: "string",
+				},
+				website: {
+					type: "string",
+				},
+			},
+		},
+		github_token: {
+			type: "string",
+		},
+	},
+};
+
+/* ------------------ Fox Linter Module ----------------- */
 
 export type FoxModule = {
 	name: string;
@@ -50,21 +107,14 @@ export type FoxModule = {
 		ecosystem: string;
 		form: string;
 	};
-	match?: Map<string, (opts: ModuleOptions, entry: fs.WalkEntry) => void>;
+	match?: Map<string, (opts: FoxModuleOptions, entry: fs.WalkEntry) => void>;
 	triggers?: {
-		onInitial: (opts: ModuleOptions) => void;
+		onInitial: (opts: FoxModuleOptions) => void;
 	};
 };
 
-export type ModuleOptions = {
+export type FoxModuleOptions = {
 	fix?: "no" | "prompt" | "yes";
-};
-
-export type Context = {
-	dir: string;
-	owner: string | null;
-	repo: string | null;
-	github_token: string;
 };
 
 export type LintRule = {

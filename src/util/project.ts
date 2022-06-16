@@ -1,6 +1,6 @@
-import { fs, toml, conversion } from "../deps.ts";
+import { fs, toml } from "../deps.ts";
 import * as util from "./util.ts";
-import { ProjectForm, ProjectEcosystem, FoxConfig } from "../types.ts";
+import * as types from "../types.ts";
 
 const enum EcosystemFiles {
 	nodePackageJson = "./package.json",
@@ -15,7 +15,7 @@ const enum EcosystemFiles {
 
 export async function determineEcosystem(
 	dir: string | URL
-): Promise<ProjectEcosystem | undefined> {
+): Promise<types.ProjectEcosystem | undefined> {
 	const oldPwd = Deno.cwd();
 	Deno.chdir(dir);
 
@@ -46,9 +46,9 @@ export async function determineEcosystem(
 }
 
 export async function determineForm(
-	foxConfig: FoxConfig,
-	ecosystemType: ProjectEcosystem
-): Promise<ProjectForm | undefined> {
+	foxConfig: types.FoxConfigProject,
+	ecosystemType: types.ProjectEcosystem
+): Promise<types.ProjectForm | undefined> {
 	if (foxConfig.form) {
 		return foxConfig.form;
 	}

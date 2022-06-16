@@ -7,7 +7,7 @@ import glueModule from "../linters/glue.ts";
 import licenseModule from "../linters/license.ts";
 import prettierModule from "../linters/prettier.ts";
 
-export const foxModules = [
+export const foxLinterModules = [
 	bakeModule,
 	basaltModule,
 	denoModule,

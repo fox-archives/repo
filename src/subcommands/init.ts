@@ -1,91 +1,165 @@
 import { flags, fs, path } from "../deps.ts";
 
 import * as util from "../util/util.ts";
+import * as helper from "../util/helper.ts";
 import * as types from "../types.ts";
 
-export async function foxInit(ctx: types.Context, args: flags.Args) {
-	const projectDir = String(args._[1] || "");
-	const projectType = String(args._[2] || "");
+export async function foxInit(args: flags.Args) {
+	const foxConfig = await helper.getGlobalFoxConfig();
 
-	if (!projectDir) {
-		util.die("Failed to specify project directory");
-	}
-	if (!/(?:(?:-|[[:alnum:]])+|\.)/.test(projectDir)) {
-		util.die("Failed to match directory regex");
-	}
-	if (!projectType) {
-		console.log(`Failed to specify project type`);
-		Deno.exit(1);
-	}
+	const ctx: types.Context = await (async () => {
+		// Ecosystem
+		const projectEcosystem = util.validateZod<types.ProjectEcosystem>(
+			types.ProjectEcosystemSchema,
+			prompt("Project Ecosystem:") ||
+				util.die("Failed to specify project ecosystem")
+		);
 
-	// projectDir
-	try {
-		Deno.chdir(projectDir);
-	} catch (err: unknown) {
-		if (!(err instanceof Error)) {
-			util.die("Unexpected");
+		// Form
+		const projectForm = util.validateZod<types.ProjectForm>(
+			types.ProjectFormSchema,
+			prompt("Project Form:") || util.die("Failed to specify project form")
+		);
+
+		// Dir
+		const projectDir = prompt("Project Directory:");
+		if (!projectDir) {
+			util.die("Failed to specify project directory");
 		}
-
-		if (err instanceof Deno.errors.NotFound) {
-			await Deno.mkdir(projectDir, { recursive: true });
+		try {
 			Deno.chdir(projectDir);
-		} else {
-			throw err;
+		} catch (unknownError: unknown) {
+			const err = util.assertInstanceOfError(unknownError);
+
+			if (err instanceof Deno.errors.NotFound) {
+				await Deno.mkdir(projectDir, { recursive: true });
+				Deno.chdir(projectDir);
+			} else {
+				throw err;
+			}
 		}
-	}
+		if ((await util.arrayFromAsync(Deno.readDir("."))).length !== 0) {
+			util.die("Specified project directory must be empty");
+		}
 
-	if ((await util.arrayFromAsync(Deno.readDir("."))).length !== 0) {
-		util.die("Project dir must be empty");
-	}
+		// Repo
+		const projectRepo = prompt("Repository Name:");
+		if (!projectRepo) {
+			util.die("Repository name cannot be empty");
+		}
 
-	const username = "hyperupcall";
-	const repoName = path.basename(Deno.cwd());
+		return {
+			ecosystem: projectEcosystem,
+			form: projectForm,
+			dir: path.join(Deno.cwd(), projectDir),
+			repo: projectRepo,
+			...foxConfig,
+		};
+	})();
 
-	// projectType
-	// Create a file that identifies what type the project is, and create a simple hello world
-	switch (projectType) {
+	const bake: { run?: string } = {
+		run: ":",
+	};
+
+	// projectEcosystem
+	switch (ctx.ecosystem) {
 		case "node":
-		case "nodejs":
-			await Deno.writeTextFile("package.json", "{}\n");
-			await Deno.writeTextFile("index.ts", `console.log("Hello, World!")`);
+		case "nodejs": {
+			// Ecosystem
+			const packageJson = {
+				name: ctx.repo,
+				version: "0.1.0",
+				main: "index.js",
+				author: "Edwin Kofler <edwin@kofler.dev> (https://edwinkofler.com)",
+				license: "NOT LICENSED", // TODO
+				type: "module",
+			};
+			await Deno.writeTextFile(
+				"package.json",
+				`${JSON.stringify(packageJson, null, "\t")}\n`
+			);
+			await Deno.writeTextFile(
+				"index.js",
+				`import * as ft from '@hyperupcall/foxtrot-nodejs'\n\nft.woof()\n`
+			);
+			await util.exec({
+				cmd: ["pnpm", "install", "@hyperupcall/foxtrot-nodejs"],
+			});
+
+			// General
+			bake.run = "node ./index.js";
 			break;
+		}
 		case "deno":
+			// Ecosystem
 			await Deno.writeTextFile("deno.jsonc", "{}\n");
-			await Deno.writeTextFile("main.ts", `console.log("Hello, World!")`);
+			await Deno.writeTextFile("main.ts", `console.log("Hello, World!")\n`);
+
+			// General
+			bake.run = "deno run ./main.ts";
 			break;
 		case "go":
 		case "golang":
-			util.exec({
-				cmd: ["go", "mod", "init", `github.com/${username}/${repoName}`],
+			// Ecosystem
+			await util.exec({
+				cmd: [
+					"go",
+					"mod",
+					"init",
+					`github.com/${ctx.owner.username}/${ctx.repo}`,
+				],
 			});
 			await Deno.writeTextFile(
 				"main.go",
 				`package main
 
+import ft "github.com/hyperupcall/foxtrot-go"
+
 func main() {
-	fmt.Println("Hello World");
-}\n`
+	ft.Woof()\n}\n`
 			);
+			await util.exec({
+				cmd: ["go", "get", "github.com/hyperupcall/foxtrot-go"],
+			});
+
+			// General
+			bake.run = "go run .";
 			break;
 		default:
-			util.die("Not supported projectType");
-			break;
+			util.die("Specified project ecosystem not supported");
 	}
 
-	console.log(`Using ${repoName}`);
+	// General
+	let bakefileShContents = "# shellcheck shell=bash\n\n";
+	for (const [taskName, taskContent] of Object.entries(bake)) {
+		bakefileShContents += `task.${taskName}() {\n\t`;
+		bakefileShContents += taskContent.split("\n").join("\t\n");
+		bakefileShContents += `\n}\n`;
+	}
+	bakefileShContents += "\n";
+	await Deno.writeTextFile("Bakefile.sh", bakefileShContents);
+	await util.exec({ cmd: ["bake"] }, { allowFailure: true });
 
-	if (await fs.exists(".git")) {
-		console.log("Info: Already have git directory. Skipping Git init stuff");
-	} else {
-		await util.exec({ cmd: ["git", "init"] });
+	await Deno.writeTextFile("README.md", `# ${ctx.repo}\n`);
 
+	// Run foxLint
+	const shouldLint = prompt("Run linter?");
+	if (/^y/iu.test(shouldLint || "")) {
+		helper.performLint(ctx);
+	}
+
+	// Initialize Git
+	{
+		await util.exec({
+			cmd: ["git", "init", "--object-format", "sha256", "-b", "main"],
+		});
 		await util.exec({
 			cmd: [
 				"git",
 				"remote",
 				"add",
 				"origin",
-				`git@github.com:${username}/${repoName}`,
+				`git@github.com:${ctx.owner.username}/${ctx.repo}`,
 			],
 		});
 
@@ -93,29 +167,13 @@ func main() {
 		await util.exec({ cmd: ["git", "commit", "-m", "chore: Initial commit"] });
 	}
 
-	await Deno.writeTextFile(
-		"Bakefile.sh",
-		`# shellcheck shell=bash
-task.build() {
-	:
-}
-
-task.util.exec() {
-	:
-}
-
-task.version() {
-	:
-}
-
-task.release() {
-	:
-}\n`
-	);
-	await util.exec({ cmd: ["bake"] });
-
-	await Deno.writeTextFile("README.md", `${repoName}\n`);
-
-	await util.exec({ cmd: ["gh", "repo", "create", repoName, "--public"] });
-	await util.exec({ cmd: ["git", "push", "-u", "origin", "main"] });
+	// Initialize GitHub
+	{
+		const input = prompt("Hook up GitHub?");
+		if (input && /^y/iu.test(input)) {
+			await util.exec({
+				cmd: ["gh", "repo", "create", ctx.repo, "--public"],
+			});
+		}
+	}
 }

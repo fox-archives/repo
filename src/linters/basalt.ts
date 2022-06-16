@@ -13,7 +13,7 @@ export default {
 	match: new Map([
 		[
 			"basalt.toml",
-			async (opts: types.ModuleOptions, entry: fs.WalkEntry) => {
+			async (opts: types.FoxModuleOptions, entry: fs.WalkEntry) => {
 				const basaltToml = toml.parse(await Deno.readTextFile(entry.path));
 
 				// const pkg = basaltToml.package as Record<string, any>;

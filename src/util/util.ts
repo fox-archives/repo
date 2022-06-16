@@ -1,5 +1,4 @@
-import { fs, toml } from "../deps.ts";
-import { FoxConfig, FoxConfigSchema } from "../types.ts";
+import { fs, toml, Ajv, path, z } from "../deps.ts";
 import * as types from "../types.ts";
 
 export function die(msg: string): never {
@@ -23,37 +22,6 @@ export function logInfo(msg: string) {
 	console.log("  - " + msg);
 }
 
-export function ensureNotEmpty(property: string, value: string) {
-	if (value === null) {
-		logInfo(`The '${property}' property should not be null`);
-	} else if (typeof value === "object") {
-		if (Object.keys(value).length === 0) {
-			logInfo(`The '${property}' property should not be an empty object`);
-		}
-	} else if (Array.isArray(value)) {
-		logInfo(`The '${property}' property should not be an empty array`);
-	} else if (typeof value === "string") {
-		if (value.trim() === "") {
-			logInfo(`The '${property}' property should not be empty`);
-		}
-	} else {
-		logInfo(`The type for '${property}' is unaccounted for`);
-	}
-}
-
-export async function writeFile(
-	opts: types.ModuleOptions,
-	path: string | URL,
-	text: string
-) {
-	if (opts.fix === "prompt") {
-		console.info("Prompting to overwrite not implemented");
-		// await Deno.writeTextFile(path, text);
-	} else if (opts.fix === "yes") {
-		await Deno.writeTextFile(path, text);
-	}
-}
-
 export function showHelp() {
 	console.log(`foxomate
 
@@ -62,7 +30,7 @@ Summary: Task automater and general linter
 Usage: foxomate [flags] [subcommand]
 
 Subcommands:
-  init [--lang=<lang>]
+  init <projectType> [projectDir]
 
   lint [--fix=no|prompt|yes] [modules ...]
 
@@ -77,20 +45,14 @@ Modules:
   - ${[].join(",")}`); // TODO
 }
 
-export async function run(args: string[]): Promise<void> {
-	const process = Deno.run({
-		cmd: args,
-	});
-	const status = await process.status();
-	process.close();
-	if (!status.success) {
-		Deno.exit(1);
-	}
-}
-
 export async function exec(
-	args: Omit<Deno.RunOptions, "stdin" | "stdout" | "stderr">
+	args: Omit<Deno.RunOptions, "stdin" | "stdout" | "stderr">,
+	{ allowFailure = true, printCmd = true } = {}
 ) {
+	if (printCmd) {
+		console.log(`Executing: ${args.cmd.join(" ")}`);
+	}
+
 	const p = Deno.run({
 		cmd: args.cmd,
 		cwd: args.cwd,
@@ -106,8 +68,14 @@ export async function exec(
 	]);
 	p.close();
 	if (!status.success) {
-		// TODO
-		throw new Error("Failed to execute process");
+		if (!allowFailure) {
+			// TODO
+			console.log("STDOUT");
+			console.log(new TextDecoder().decode(stdout));
+			console.log("STDERR");
+			console.error(new TextDecoder().decode(stderr));
+			die("Executing process unexpectedly failed");
+		}
 	}
 
 	return {
@@ -134,21 +102,36 @@ export async function arrayFromAsync<T>(asyncItems: AsyncIterable<T>) {
 	return arr;
 }
 
-export async function getFoxConfig(): Promise<FoxConfig> {
-	const validateCfg = (obj: unknown) => {
-		const data = FoxConfigSchema.safeParse(obj);
-		if (!data.success) {
-			// TODO
-			console.error(data.error.issues);
-			die("Schema validation failed");
-		}
+export function validateAjv<T>(schema: Record<string, unknown>, data: unknown) {
+	const ajv = new Ajv();
 
-		return obj as FoxConfig;
-	};
+	const validate = ajv.compile(schema);
+	const valid = validate(data);
+	if (!valid) {
+		console.error(validate.errors); // FIXME better error
+		die("Failed to validate against schema");
+	}
 
+	return data as T;
+}
+
+export function validateZod<T>(schema: z.ZodType, data: unknown) {
+	const parsedData = schema.safeParse(data);
+	if (!parsedData.success) {
+		console.error(parsedData.error.issues); // FIXME better error
+		die("Failed to validate against schema");
+	}
+
+	return data as T;
+}
+
+export async function readConfig(
+	dir: string,
+	name: string
+): Promise<Record<string, unknown>> {
 	try {
-		const foxJson = await Deno.readTextFile("./fox.json");
-		return validateCfg(JSON.parse(foxJson));
+		const foxJson = await Deno.readTextFile(path.join(dir, name + ".json"));
+		return JSON.parse(foxJson);
 	} catch (errUnknown: unknown) {
 		const err = assertInstanceOfError(errUnknown);
 		if (!(err instanceof Deno.errors.NotFound)) {
@@ -157,8 +140,8 @@ export async function getFoxConfig(): Promise<FoxConfig> {
 	}
 
 	try {
-		const foxToml = await Deno.readTextFile("./fox.toml");
-		return validateCfg(toml.parse(foxToml));
+		const foxToml = await Deno.readTextFile(path.join(dir, name + ".toml"));
+		return toml.parse(foxToml);
 	} catch (errUnknown: unknown) {
 		const err = assertInstanceOfError(errUnknown);
 		if (!(err instanceof Deno.errors.NotFound)) {
@@ -166,5 +149,5 @@ export async function getFoxConfig(): Promise<FoxConfig> {
 		}
 	}
 
-	return validateCfg({});
+	return {};
 }
