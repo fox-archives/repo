@@ -151,3 +151,12 @@ export async function readConfig(
 
 	return {};
 }
+
+export function saysYesTo(msg: string): boolean {
+	const input = prompt("Hook up GitHub?");
+	if (input && /^y/iu.test(input)) {
+		return true;
+	}
+
+	return false;
+}

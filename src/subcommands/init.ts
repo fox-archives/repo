@@ -57,8 +57,9 @@ export async function foxInit(args: flags.Args) {
 		};
 	})();
 
-	const bake: { run?: string } = {
+	const bake: { run?: string; update?: string } = {
 		run: ":",
+		update: "foxxy update",
 	};
 
 	// projectEcosystem
@@ -143,13 +144,12 @@ func main() {
 	await Deno.writeTextFile("README.md", `# ${ctx.repo}\n`);
 
 	// Run foxLint
-	const shouldLint = prompt("Run linter?");
-	if (/^y/iu.test(shouldLint || "")) {
+	if (util.saysYesTo("Run linter?")) {
 		helper.performLint(ctx);
 	}
 
 	// Initialize Git
-	{
+	if (util.saysYesTo("Initialize Git?")) {
 		await util.exec({
 			cmd: ["git", "init", "--object-format", "sha256", "-b", "main"],
 		});
@@ -168,12 +168,19 @@ func main() {
 	}
 
 	// Initialize GitHub
-	{
-		const input = prompt("Hook up GitHub?");
-		if (input && /^y/iu.test(input)) {
-			await util.exec({
-				cmd: ["gh", "repo", "create", ctx.repo, "--public"],
-			});
-		}
+	if (util.saysYesTo("Hook up GitHub")) {
+		await util.exec({
+			cmd: [
+				"gh",
+				"repo",
+				"create",
+				ctx.repo,
+				"--disable-wiki",
+				"--public",
+				"--push",
+				"--remote",
+				"origin",
+			],
+		});
 	}
 }
