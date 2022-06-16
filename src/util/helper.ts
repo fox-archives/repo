@@ -128,3 +128,16 @@ export async function getGlobalFoxConfig(): Promise<types.FoxConfigGlobal> {
 		json
 	);
 }
+export async function incrementVersion(oldVersion: string): Promise<string> {
+	console.log(`Old version: ${oldVersion}`);
+	const newVersion = await prompt("New version?");
+	console.log(`You chose: ${newVersion}`);
+
+	if (!newVersion) {
+		// FIXME
+		console.error("Failed to get input. Exiting");
+		Deno.exit(1);
+	}
+
+	return newVersion;
+}

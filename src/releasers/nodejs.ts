@@ -1,4 +1,4 @@
-import * as releaseUtils from "../util/releaseUtils.ts";
+import * as helper from "../util/helper.ts";
 
 export default {
 	id: "nodejs",
@@ -6,7 +6,7 @@ export default {
 	async release() {
 		const packageJsonFile = "./package.json";
 		const packageJson = JSON.parse(await Deno.readTextFile(packageJsonFile));
-		const newVersion = await releaseUtils.incrementVersion(packageJson.version);
+		const newVersion = await helper.incrementVersion(packageJson.version);
 		packageJson.version = newVersion;
 
 		await Deno.writeTextFile(
