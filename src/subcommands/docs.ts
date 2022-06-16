@@ -104,7 +104,7 @@ export async function foxDocs(args: flags.Args) {
 				},
 				body: JSON.stringify({
 					source: {
-						branch: "site",
+						branch: settings.remoteBranchName,
 						path: "/",
 					},
 				}),
