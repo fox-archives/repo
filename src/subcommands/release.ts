@@ -6,7 +6,7 @@ import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 
 export async function foxRelease(args: flags.Args) {
-	const ctx = await helper.getCtx();
+	const ctx = await helper.getContext();
 
 	await NodeJSReleaser.release();
 }

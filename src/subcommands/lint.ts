@@ -3,19 +3,19 @@ import { flags, c, fs, path } from "../deps.ts";
 import * as types from "../types.ts";
 import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
-import * as project from "../util/project.ts";
+import * as projectUtils from "../util/projectUtils.ts";
 
 export async function foxLint(args: flags.Args) {
-	const ctx = await helper.getCtx();
+	const ctx = await helper.getContext();
 	const foxConfig = await helper.getProjectFoxConfig();
 
-	const ecosystem = await project.determineEcosystem(".");
+	const ecosystem = await projectUtils.determineEcosystem(".");
 	if (!ecosystem) {
 		util.die("Failed to automatically calculate 'ecosystem'");
 	}
 	console.log(`Ecosystem: ${ecosystem}`);
 
-	const form = await project.determineForm(foxConfig, ecosystem);
+	const form = await projectUtils.determineForm(foxConfig, ecosystem);
 	if (!form) {
 		util.die("Failed to automatically calculate 'form'");
 	}

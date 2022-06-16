@@ -3,10 +3,10 @@ import { flags, fs, path, yaml } from "../deps.ts";
 import * as types from "../types.ts";
 import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
-import * as project from "../util/project.ts";
+import * as projectUtils from "../util/projectUtils.ts";
 
 export async function foxDocs(args: flags.Args) {
-	const ctx = await helper.getCtx();
+	const ctx = await helper.getContext();
 
 	const apiRepoUrl = `https://api.github.com/repos/${ctx.owner}/${ctx.repo}`;
 

@@ -2,6 +2,7 @@ import { fs, path, Ajv } from "../deps.ts";
 
 import * as types from "../types.ts";
 import * as util from "./util.ts";
+import * as projectUtils from "./projectUtils.ts";
 import { foxLinterModules } from "../linters/index.ts";
 
 export async function performLint(ctx: types.Context) {
@@ -43,7 +44,7 @@ export async function performLint(ctx: types.Context) {
 	}
 }
 
-export async function getCtx() {
+export async function getContext() {
 	await cdToProjectRoot();
 
 	const result = await util.exec({
@@ -54,29 +55,23 @@ export async function getCtx() {
 		util.die("Could not find repo"); // FIXME
 	}
 
-	// FIXME
-	const foxConfig = path.join(
-		Deno.env.get("HOME") || "",
-		".config",
-		"fox",
-		"config.json"
-	);
-	const json = JSON.parse(await Deno.readTextFile(foxConfig));
-	if (!json.github_token) {
-		util.die("Faield to find github token");
-	}
-	const info = {
-		repo,
-		github_token: json.github_token,
-	};
+	const foxConfigGlobal = await getGlobalFoxConfig();
+	const foxConfig = await getProjectFoxConfig();
+
+	const dir = Deno.cwd(); // TODO
+	const ecosystem =
+		(await projectUtils.determineEcosystem(dir)) ||
+		util.die("Failed to determine ecosystem");
 
 	const ctx: types.Context = {
-		ecosystem: "deno",
-		form: "lib",
-		dir: Deno.cwd(),
-		owner: json.owner as types.Context["owner"],
-		repo: info.repo,
-		github_token: info.github_token,
+		ecosystem,
+		form:
+			(await projectUtils.determineForm(foxConfig, ecosystem)) ||
+			util.die("Failed to determine form"),
+		dir,
+		repo: repo,
+		owner: foxConfigGlobal.owner,
+		github_token: foxConfigGlobal.github_token,
 	};
 	return ctx;
 }
