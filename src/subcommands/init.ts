@@ -5,9 +5,11 @@ import * as helper from "../util/helper.ts";
 import * as types from "../types.ts";
 
 export async function foxInit(args: flags.Args) {
-	const foxConfig = await helper.getGlobalFoxConfig();
+	const foxConfigGlobal = await helper.getFoxConfigGlobal();
 
-	const ctx: types.Context = await (async () => {
+	const ctx = await (async (): Promise<
+		types.Context & { git: NonNullable<types.Context["git"]> }
+	> => {
 		// Ecosystem
 		const projectEcosystem = util.validateZod<types.ProjectEcosystem>(
 			types.ProjectEcosystemSchema,
@@ -43,23 +45,34 @@ export async function foxInit(args: flags.Args) {
 		}
 
 		// Repo
+		const projectOwner = prompt("Repository Owner:");
+		if (!projectOwner) {
+			util.die("Repository owner cannot be empty");
+		}
+
+		// Repo
 		const projectRepo = prompt("Repository Name:");
 		if (!projectRepo) {
 			util.die("Repository name cannot be empty");
 		}
 
 		return {
+			dir: path.join(Deno.cwd(), projectDir),
+			git: {
+				site: "github.com",
+				owner: projectOwner,
+				repo: projectRepo,
+			},
 			ecosystem: projectEcosystem,
 			form: projectForm,
-			dir: path.join(Deno.cwd(), projectDir),
-			repo: projectRepo,
-			...foxConfig,
+			...foxConfigGlobal,
 		};
 	})();
 
-	const bake: { run?: string; update?: string } = {
+	const bake: { run?: string; update?: string; docs: string } = {
 		run: ":",
 		update: "foxxy update",
+		docs: "foxxy docs",
 	};
 
 	// projectEcosystem
@@ -68,7 +81,7 @@ export async function foxInit(args: flags.Args) {
 		case "nodejs": {
 			// Ecosystem
 			const packageJson = {
-				name: ctx.repo,
+				name: ctx.git.repo,
 				version: "0.1.0",
 				main: "index.js",
 				author: "Edwin Kofler <edwin@kofler.dev> (https://edwinkofler.com)",
@@ -107,7 +120,7 @@ export async function foxInit(args: flags.Args) {
 					"go",
 					"mod",
 					"init",
-					`github.com/${ctx.owner.username}/${ctx.repo}`,
+					`github.com/${ctx.git.owner}/${ctx.git.repo}`,
 				],
 			});
 			await Deno.writeTextFile(
@@ -141,7 +154,7 @@ func main() {
 	await Deno.writeTextFile("Bakefile.sh", bakefileShContents);
 	await util.exec({ cmd: ["bake"] }, { allowFailure: true });
 
-	await Deno.writeTextFile("README.md", `# ${ctx.repo}\n`);
+	await Deno.writeTextFile("README.md", `# ${ctx.git.repo}\n`);
 
 	// Run foxLint
 	if (util.saysYesTo("Run linter?")) {
@@ -159,7 +172,7 @@ func main() {
 				"remote",
 				"add",
 				"origin",
-				`git@github.com:${ctx.owner.username}/${ctx.repo}`,
+				`git@github.com:${ctx.git.owner}/${ctx.git.repo}`,
 			],
 		});
 
@@ -174,7 +187,7 @@ func main() {
 				"gh",
 				"repo",
 				"create",
-				ctx.repo,
+				ctx.git.repo,
 				"--disable-wiki",
 				"--public",
 				"--push",

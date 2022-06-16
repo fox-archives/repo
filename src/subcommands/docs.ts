@@ -8,63 +8,85 @@ import * as projectUtils from "../util/projectUtils.ts";
 export async function foxDocs(args: flags.Args) {
 	const ctx = await helper.getContext();
 
-	const apiRepoUrl = `https://api.github.com/repos/${ctx.owner}/${ctx.repo}`;
+	if (!ctx.git) {
+		util.die("The repository must have a valid remote");
+	}
+
+	const settings = {
+		docsInputDir: "docs",
+		docsOutputDir: "site",
+		remoteName: "origin",
+		remoteBranchName: "site",
+		options: {
+			mkdocs: {
+				// repo_name
+				// edit_uri
+				// nav
+				theme: {
+					name: "readthedocs",
+					locale: "en",
+				},
+				use_directory_urls: true,
+				strict: false,
+			},
+		},
+	};
+
+	const remoteUrls = {
+		api: `https://api.github.com/repos/${ctx.git.owner}/${ctx.git.repo}`,
+		site: `https://${ctx.git.owner}.github.io/${ctx.git.repo}`,
+		repo: `https://github.com/${ctx.git.owner}/${ctx.git.repo}`,
+	};
 
 	const mkdocsYml = {
-		site_name: "dotfox",
-		site_url: `https://${ctx.owner}.github.io/${ctx.repo}`,
-		repo_url: `https://github.com/${ctx.owner}/${ctx.repo}`,
-		// repo_name
-		// edit_uri
-		site_description: "",
-		site_author: "Edwin Kofler",
-		copyright: "© Edwin Kofler",
-		remote_branch: "site",
-		remote_name: "origin",
-		// nav
-		theme: {
-			name: "readthedocs",
-			locale: "en",
-		},
-		docs_dir: path.join(ctx.dir, "docs"),
-		site_dir: path.join(ctx.dir, "site"),
-		use_directory_urls: true,
-		strict: false,
+		site_name: ctx.git.repo,
+		site_url: remoteUrls.site,
+		repo_url: remoteUrls.repo,
+		// site_description: "", // TODO
+		site_author: ctx.person.fullname,
+		copyright: `© ${ctx.person.fullname}`,
+		remote_branch: settings.remoteBranchName,
+		remote_name: settings.remoteName,
+		docs_dir: path.join(ctx.dir, settings.docsInputDir),
+		site_dir: path.join(ctx.dir, settings.docsOutputDir),
+		...settings.options.mkdocs,
 	};
-	const content = yaml.stringify(mkdocsYml);
 
-	const tmpDir = await Deno.makeTempDir({
-		prefix: "fox-",
-	});
-	try {
-		const mkdocsFile = path.join(tmpDir, "./mkdocs.yml");
-		await Deno.writeTextFile(mkdocsFile, content);
-
-		await util.exec({
-			cmd: ["pipx", "run", "mkdocs", "build", "-f", mkdocsFile],
+	// Push documentation branch to remote
+	{
+		const tmpDir = await Deno.makeTempDir({
+			prefix: "foxxy-",
 		});
+		try {
+			const mkdocsFile = path.join(tmpDir, "./mkdocs.yml");
+			await Deno.writeTextFile(mkdocsFile, yaml.stringify(mkdocsYml));
 
-		await util.exec({
-			cmd: [
-				"pipx",
-				"run",
-				"ghp-import",
-				"--no-jekyll",
-				"--push",
-				"--remote",
-				"origin",
-				"--branch",
-				"site",
-				"./site",
-			],
-		});
-	} finally {
-		await Deno.remove(tmpDir, { recursive: true });
+			await util.exec({
+				cmd: ["pipx", "run", "mkdocs", "build", "-f", mkdocsFile],
+			});
+
+			await util.exec({
+				cmd: [
+					"pipx",
+					"run",
+					"ghp-import",
+					"--no-jekyll",
+					"--push",
+					"--remote",
+					settings.remoteName,
+					"--branch",
+					settings.remoteBranchName,
+					settings.docsOutputDir,
+				],
+			});
+		} finally {
+			await Deno.remove(tmpDir, { recursive: true });
+		}
 	}
 
 	// Ensure GitHub pages are active
 	{
-		const res = await fetch(`${apiRepoUrl}/pages`, {
+		const res = await fetch(`${remoteUrls.api}/pages`, {
 			headers: {
 				accept: "application/vnd.github.v3+json",
 				authorization: `token ${ctx.github_token}`,
@@ -74,7 +96,7 @@ export async function foxDocs(args: flags.Args) {
 			util.logInfo("GitHub pages already exists");
 		} else {
 			util.logInfo("GitHub pages does not exist. Creating now");
-			const res = await fetch(`${apiRepoUrl}/pages`, {
+			const res = await fetch(`${remoteUrls.api}/pages`, {
 				method: "POST",
 				headers: {
 					accept: "application/vnd.github.v3+json",
@@ -95,9 +117,10 @@ export async function foxDocs(args: flags.Args) {
 		}
 	}
 
+	// TODO
 	// {
 	// 	util.logInfo("Updating CNAME and https enforced");
-	// 	const res = await fetch(`${apiRepoUrl}/pages`, {
+	// 	const res = await fetch(`${remoteUrls.api}/pages`, {
 	// 		method: "PUT",
 	// 		headers: {
 	// 			accept: "application/vnd.github.v3+json",
@@ -115,23 +138,23 @@ export async function foxDocs(args: flags.Args) {
 	// 	}
 	// }
 
-	// Update "website" repo parameter
+	// Update remote with website URL
 	{
 		util.logInfo("Updating website repo");
-		const res = await fetch(`${apiRepoUrl}`, {
+		const res = await fetch(`${remoteUrls.api}`, {
 			method: "PATCH",
 			headers: {
 				accept: "application/vnd.github.v3+json",
 				authorization: `token ${ctx.github_token}`,
 			},
 			body: JSON.stringify({
-				homepage: `https://${ctx.owner}.github.io/${ctx.repo}`,
+				homepage: `https://${ctx.git.owner}.github.io/${ctx.git.repo}`,
 			}),
 		});
 		if (!res.ok) {
 			const json = await res.json();
 			console.warn(json);
-			util.die("Failed to do thing");
+			util.die("Failed to set homepage for GitHub repo");
 		}
 	}
 }

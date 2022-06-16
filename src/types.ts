@@ -1,19 +1,21 @@
 import { fs, z } from "./deps.ts";
 
 /* ----------------------- Context ---------------------- */
+export type GitRemoteInfo =
+	| {
+			site: string;
+			owner: string;
+			repo: string;
+	  }
+	| undefined;
 
 export type Context = {
 	dir: string;
+	git: GitRemoteInfo;
 	ecosystem: ProjectEcosystem;
 	form: ProjectForm;
-	owner: {
-		username: string;
-		fullname: string;
-		email: string;
-		website: string;
-	};
-	repo: string;
-	github_token: string;
+	person: FoxConfigGlobal["person"];
+	github_token: FoxConfigGlobal["github_token"];
 };
 
 /* --------------- Fox Configuration File --------------- */
@@ -27,7 +29,8 @@ export type ProjectEcosystem =
 	| "rust"
 	| "nim"
 	| "basalt"
-	| "gradle";
+	| "gradle"
+	| "unknown";
 export const ProjectEcosystemSchema = z.union([
 	z.literal("node"),
 	z.literal("nodejs"),
@@ -38,10 +41,15 @@ export const ProjectEcosystemSchema = z.union([
 	z.literal("nim"),
 	z.literal("basalt"),
 	z.literal("gradle"),
+	z.literal("unknown"),
 ]);
 
-export type ProjectForm = "app" | "lib";
-export const ProjectFormSchema = z.union([z.literal("app"), z.literal("lib")]);
+export type ProjectForm = "app" | "lib" | "unknown";
+export const ProjectFormSchema = z.union([
+	z.literal("app"),
+	z.literal("lib"),
+	z.literal("unknown"),
+]);
 
 export type FoxConfigProject = {
 	ecosystem?: ProjectEcosystem;
@@ -61,34 +69,30 @@ export const FoxConfigProjectSchema = {
 };
 
 export type FoxConfigGlobal = {
-	owner: {
-		username: string;
+	person: {
 		fullname: string;
 		email: string;
-		website: string;
+		websiteURL: string;
 	};
 	github_token: string;
 };
 export const FoxConfigGlobalSchema = {
 	type: "object",
 	additionalProperties: false,
-	required: ["owner", "github_token"],
+	required: ["person", "github_token"],
 	properties: {
-		owner: {
+		person: {
 			type: "object",
 			additionalProperties: false,
-			required: ["username", "fullname", "email", "website"],
+			required: ["fullname", "email", "websiteURL"],
 			properties: {
-				username: {
-					type: "string",
-				},
 				fullname: {
 					type: "string",
 				},
 				email: {
 					type: "string",
 				},
-				website: {
+				websiteURL: {
 					type: "string",
 				},
 			},

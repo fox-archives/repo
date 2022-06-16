@@ -7,7 +7,7 @@ import * as projectUtils from "../util/projectUtils.ts";
 
 export async function foxLint(args: flags.Args) {
 	const ctx = await helper.getContext();
-	const foxConfig = await helper.getProjectFoxConfig();
+	const foxConfig = await helper.getFoxConfigLocal();
 
 	const ecosystem = await projectUtils.determineEcosystem(".");
 	if (!ecosystem) {

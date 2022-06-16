@@ -44,36 +44,28 @@ export async function performLint(ctx: types.Context) {
 	}
 }
 
-export async function getContext() {
+export async function getContext(): Promise<types.Context> {
 	await cdToProjectRoot();
 
-	const result = await util.exec({
-		cmd: ["git", "remote", "get-url", "origin"],
-	});
-	const repo = result.stdout.split("/").at(-1);
-	if (!repo) {
-		util.die("Could not find repo"); // FIXME
-	}
+	const foxConfigGlobal = await getFoxConfigGlobal();
+	const foxConfigLocal = await getFoxConfigLocal();
+	const gitRemoteInfo = await util.getGitRemoteInfo();
 
-	const foxConfigGlobal = await getGlobalFoxConfig();
-	const foxConfig = await getProjectFoxConfig();
+	const projectDir = Deno.cwd();
+	const projectEcosystem = await projectUtils.determineEcosystem(projectDir);
+	const projectForm = await projectUtils.determineForm(
+		foxConfigLocal,
+		projectEcosystem
+	);
 
-	const dir = Deno.cwd(); // TODO
-	const ecosystem =
-		(await projectUtils.determineEcosystem(dir)) ||
-		util.die("Failed to determine ecosystem");
-
-	const ctx: types.Context = {
-		ecosystem,
-		form:
-			(await projectUtils.determineForm(foxConfig, ecosystem)) ||
-			util.die("Failed to determine form"),
-		dir,
-		repo: repo,
-		owner: foxConfigGlobal.owner,
+	return {
+		dir: projectDir,
+		git: gitRemoteInfo,
+		ecosystem: projectEcosystem,
+		form: projectForm,
+		person: foxConfigGlobal.person,
 		github_token: foxConfigGlobal.github_token,
 	};
-	return ctx;
 }
 
 export async function cdToProjectRoot() {
@@ -101,7 +93,7 @@ export async function cdToProjectRoot() {
 	util.die("Expected fox.json or git repository"); // FIXME
 }
 
-export async function getProjectFoxConfig(): Promise<types.FoxConfigProject> {
+export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 	const json = await util.readConfig(".", "fox");
 	return util.validateAjv<types.FoxConfigProject>(
 		types.FoxConfigProjectSchema,
@@ -109,7 +101,7 @@ export async function getProjectFoxConfig(): Promise<types.FoxConfigProject> {
 	);
 }
 
-export async function getGlobalFoxConfig(): Promise<types.FoxConfigGlobal> {
+export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 	// FIXME: Throw expressions once landed or xdg library
 	const foxConfigDir = path.join(
 		Deno.env.get("XDG_CONFIG_HOME") ||

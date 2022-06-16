@@ -15,7 +15,7 @@ const enum EcosystemFiles {
 
 export async function determineEcosystem(
 	dir: string | URL
-): Promise<types.ProjectEcosystem | undefined> {
+): Promise<types.ProjectEcosystem> {
 	const oldPwd = Deno.cwd();
 	Deno.chdir(dir);
 
@@ -37,6 +37,8 @@ export async function determineEcosystem(
 			return "nim";
 		} else if (await fs.exists(EcosystemFiles.basaltToml)) {
 			return "basalt";
+		} else {
+			return "unknown";
 		}
 	})();
 
@@ -48,7 +50,7 @@ export async function determineEcosystem(
 export async function determineForm(
 	foxConfig: types.FoxConfigProject,
 	ecosystemType: types.ProjectEcosystem
-): Promise<types.ProjectForm | undefined> {
+): Promise<types.ProjectForm> {
 	if (foxConfig.form) {
 		return foxConfig.form;
 	}
@@ -70,4 +72,6 @@ export async function determineForm(
 			break;
 		}
 	}
+
+	return "unknown";
 }
