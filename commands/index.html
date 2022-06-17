@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Edwin Kofler" /><link rel="canonical" href="https://hyperupcall.github.io/foxxy/motivation/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Edwin Kofler" /><link rel="canonical" href="https://hyperupcall.github.io/foxxy/commands/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Motivation - foxxy</title>
+    <title>Commands - foxxy</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Motivation";
-        var mkdocs_page_input_path = "motivation.md";
-        var mkdocs_page_url = "/foxxy/motivation/";
+        var mkdocs_page_name = "Commands";
+        var mkdocs_page_input_path = "commands.md";
+        var mkdocs_page_url = "/foxxy/commands/";
       </script>
     
     <script src="../js/jquery-3.6.0.min.js" defer></script>
@@ -44,18 +44,26 @@
                 <li class="toctree-l1"><a class="reference internal" href="..">Foxxy</a>
                 </li>
               </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../commands/">Commands</a>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Commands</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#init">init</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#lint">lint</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#docs">docs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#release">release</a>
+    </li>
+    </ul>
                 </li>
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../concepts/">Concepts</a>
                 </li>
               </ul>
-              <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="./">Motivation</a>
-    <ul class="current">
-    </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../motivation/">Motivation</a>
                 </li>
               </ul>
       </div>
@@ -71,9 +79,9 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Motivation</li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Commands</li>
     <li class="wy-breadcrumbs-aside">
-        <a href="https://github.com/hyperupcall/foxxy/edit/master/docs/motivation.md"
+        <a href="https://github.com/hyperupcall/foxxy/edit/master/docs/commands.md"
           class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
@@ -83,25 +91,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="motivation">Motivation</h1>
-<p>It's tough synchronizing configuration across multiple repositories. Configuration is necessary to maximize the benefits of using tools like <a href="https://editorconfig.org">EditorConfig</a>, <a href="https://eslint.org">ESLint</a>, <a href="https://stylelint.io">Stylelint</a>, and many others</p>
-<p>However, setting up configuration can be time consuming, and error-prone. It's something that can be automated.</p>
-<p>I first approached this problem by developing <a href="https://github.com/hyperupcall/glue">Glue</a>. It had a number of problems:</p>
-<ol>
-<li>Coupling the task runner and the configuration manager.</li>
-</ol>
-<p>I thought this would make things more simple, but increased complexity since supposed-general-enough "tasks" would often need to be overridden on a per-repository Basis.</p>
-<p>With Foxxy, it interoperates with any task runner, such as with <a href="https://github.com/hyperupcall/bake">Bake</a>, my home-grown one</p>
-<ol>
-<li>Authoring the software in Bash</li>
-</ol>
-<p>Originally, Glue was written in Bash, since it is highly portable (if carefully written) and terse. I understood the well-known deficiencies of Bash, but thought my existing experience would significantly mitigate the drawbacks. But, I ended up sidetracked writing a <a href="https://github.com/hyperupcall/basalt">package manager for Bash</a>, among other tools that wouldn't have been necessary in a different language</p>
-<p>Now implemented in Deno, things are trivial to modify. If Deno doesn't support an architecture I need to use, I'll simply refactor to Go</p>
+                <h1 id="commands">Commands</h1>
+<h2 id="init">init</h2>
+<p>Initializes a new project in directory for a particular ecosystem</p>
+<h2 id="lint">lint</h2>
+<p>Lints the configuration of a particular ecosystem. For example, it may check to ensure <code>eslint-config-hyperupcall</code> is installed, used, and update to date for a NodeJS application</p>
+<h2 id="docs">docs</h2>
+<p>Generates documentation</p>
+<h2 id="release">release</h2>
+<p>Release a version for a particular ecosystem</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../concepts/" class="btn btn-neutral float-left" title="Concepts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href=".." class="btn btn-neutral float-left" title="Foxxy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../concepts/" class="btn btn-neutral float-right" title="Concepts">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -129,8 +133,10 @@
         </span>
     
     
-      <span><a href="../concepts/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../concepts/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
