@@ -5,6 +5,7 @@ import denoModule from "./deno.ts";
 import editorConfigModule from "./editorconfig.ts";
 import gitModule from "./git.ts";
 import glueModule from "./glue.ts";
+import hookahModule from "./hookah.ts";
 import licenseModule from "./license.ts";
 import prettierModule from "./prettier.ts";
 
@@ -15,6 +16,7 @@ export const foxLinterModules = [
 	denoModule,
 	editorConfigModule,
 	gitModule,
+	hookahModule,
 	glueModule,
 	licenseModule,
 	prettierModule,

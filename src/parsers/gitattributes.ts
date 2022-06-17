@@ -24,7 +24,9 @@ export function parseGitattributes(text: string) {
 		} else {
 			const trimmedLine = line.trim();
 			if (trimmedLine.at(0) === '"') {
-				util.die("C-style commented patterns are not supported"); // FIXME
+				util.die(
+					"Parsing C-style comments in Gitignore files is not supported"
+				);
 			}
 			const [pattern, ...attributes] = trimmedLine
 				.replace(/\s+/g, " ")
