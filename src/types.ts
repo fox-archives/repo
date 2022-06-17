@@ -113,8 +113,8 @@ export const FoxConfigGlobalSchema = {
 export type FoxModule = {
 	name: string;
 	activateOn: {
-		ecosystem: ProjectEcosystem | "ALL";
-		form: ProjectForm | "ALL";
+		ecosystem: Omit<ProjectEcosystem, "unknown"> | "any";
+		form: Omit<ProjectForm, "unknown"> | "any";
 	};
 	match?: Map<
 		string,

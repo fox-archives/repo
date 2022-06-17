@@ -2,8 +2,8 @@ export default {
 	id: "bash",
 	name: "Bash",
 	activateOn: {
-		ecosystem: "ALL",
-		form: "ALL",
+		ecosystem: "any",
+		form: "any",
 	},
 };
 // import { fs } from "../deps.ts";

@@ -7,7 +7,7 @@ export default {
 	name: "Deno",
 	activateOn: {
 		ecosystem: "deno",
-		form: "ALL",
+		form: "any",
 	},
 	match: new Map([
 		[

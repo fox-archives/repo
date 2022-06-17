@@ -7,8 +7,8 @@ export default {
 	id: "basalt",
 	name: "Basalt",
 	activateOn: {
-		ecosystem: "ALL",
-		form: "ALL",
+		ecosystem: "any",
+		form: "any",
 	},
 	match: new Map([
 		[

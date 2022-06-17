@@ -7,8 +7,8 @@ export default {
 	id: "license",
 	name: "License",
 	activateOn: {
-		ecosystem: "ALL",
-		form: "ALL",
+		ecosystem: "any",
+		form: "any",
 	},
 	triggers: {
 		async onInitial(opts: types.FoxModuleOptions, notices: types.Notice[]) {
