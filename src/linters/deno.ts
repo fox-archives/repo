@@ -12,7 +12,11 @@ export default {
 	match: new Map([
 		[
 			"deno.json",
-			async (opts: types.FoxModuleOptions, entry: fs.WalkEntry) => {
+			async (
+				opts: types.FoxModuleOptions,
+				entry: fs.WalkEntry,
+				notices: types.Notice[]
+			) => {
 				const denoJson = JSON.parse(await Deno.readTextFile(entry.path));
 				const expected = {
 					fmt: {

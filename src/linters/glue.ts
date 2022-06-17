@@ -11,7 +11,7 @@ export default {
 		form: "ALL",
 	},
 	triggers: {
-		async onInitial(opts: types.FoxModuleOptions) {
+		async onInitial(opts: types.FoxModuleOptions, notices: types.Notice[]) {
 			try {
 				await Deno.remove("glue.toml");
 			} catch (unknownError: unknown) {

@@ -9,7 +9,11 @@ export default {
 	match: new Map([
 		[
 			"package.json",
-			(opts: types.FoxModuleOptions, entry: fs.WalkEntry) => {
+			(
+				opts: types.FoxModuleOptions,
+				entry: fs.WalkEntry,
+				notices: types.Notice[]
+			) => {
 				const packageJson = JSON.parse(entry.path);
 				if (packageJson?.prettier) {
 					lintPrettierConfig(packageJson);
@@ -18,14 +22,22 @@ export default {
 		],
 		[
 			".prettierrc.json",
-			(opts: types.FoxModuleOptions, entry: fs.WalkEntry) => {
+			(
+				opts: types.FoxModuleOptions,
+				entry: fs.WalkEntry,
+				notices: types.Notice[]
+			) => {
 				const prettierConfig = JSON.parse(entry.path);
 				lintPrettierConfig(prettierConfig);
 			},
 		],
 		[
 			"@(.prettierrc|.prettierrc.yml|.prettierrc.yaml|.prettierrc.json5|.prettierrc.js|.prettierrc.cjs|prettier.config.js|prettier.config.cjs|.prettierrc.toml)",
-			(opts: types.FoxModuleOptions, entry: fs.WalkEntry) => {
+			(
+				opts: types.FoxModuleOptions,
+				entry: fs.WalkEntry,
+				notices: types.Notice[]
+			) => {
 				console.log("not supported: " + entry.path); // TODO
 			},
 		],

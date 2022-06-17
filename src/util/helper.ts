@@ -18,11 +18,12 @@ export async function performLint(ctx: types.Context) {
 		}
 	}
 
+	const notices: types.Notice | [] = [];
 	const foxOptions: types.FoxModuleOptions = {};
 	for (const module of moduleList) {
 		if (module.triggers?.onInitial) {
 			console.log(`Executing: ${module.name}::onInitial()`);
-			await module.triggers.onInitial(foxOptions);
+			await module.triggers.onInitial(foxOptions, notices);
 		}
 	}
 	// FIXME: use path.joinGlobs to autofilter
@@ -37,10 +38,15 @@ export async function performLint(ctx: types.Context) {
 			for (const [glob, fn] of module.match) {
 				if (entry.path.match(path.globToRegExp(glob))) {
 					console.log(`Executing: ${module.name}::${glob}`);
-					await fn(foxOptions, entry);
+					await fn(foxOptions, entry, notices);
 				}
 			}
 		}
+	}
+
+	if (notices.length > 0) {
+		console.log("NOTICES");
+		console.log(notices);
 	}
 }
 

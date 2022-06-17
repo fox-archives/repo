@@ -17,9 +17,7 @@ export default {
 		form: "ALL",
 	},
 	triggers: {
-		async onInitial(opts: types.FoxModuleOptions) {
-			const problems: types.LintRule[] = [];
-
+		async onInitial(opts: types.FoxModuleOptions, notices: types.Notice[]) {
 			if (opts.fix) {
 				await fs.ensureFile(".gitattributes");
 			}
@@ -28,7 +26,7 @@ export default {
 			const parsed = parseGitattributes(text);
 			const { foxxyAttributes, otherAttributes } = separateGitattributes(
 				parsed,
-				problems
+				notices
 			);
 
 			const finalFoxxyAttributes: GitAttributeLine[] = [
@@ -48,7 +46,7 @@ export default {
 			];
 
 			if (asserts.equal(foxxyAttributes, finalFoxxyAttributes)) {
-				problems.push({
+				notices.push({
 					name: "outdated-foxxy-attributes",
 					description: "The automatically generated attributes are out of date",
 				});
@@ -66,7 +64,7 @@ export default {
 				})();
 
 				if (present !== -1) {
-					problems.push({
+					notices.push({
 						name: "duplicated attributes",
 						description:
 							"An automatically generated attribute duplicates with an already existing one",
@@ -88,7 +86,7 @@ export default {
 			for (const finalAttribute of finalAttributes) {
 				if (finalAttribute.pattern && finalAttribute.attributes) {
 					if (finalAttribute.pattern.includes("glue")) {
-						problems.push({
+						notices.push({
 							name: "has-old-glue",
 							description: "Should not have references to 'glue",
 						});

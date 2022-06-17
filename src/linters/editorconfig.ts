@@ -11,7 +11,7 @@ export default {
 		form: "ALL",
 	},
 	triggers: {
-		async onInitial(opts: types.FoxModuleOptions) {
+		async onInitial(opts: types.FoxModuleOptions, notices: types.Notice[]) {
 			const problems: types.LintRule[] = [];
 
 			if (opts.fix) {

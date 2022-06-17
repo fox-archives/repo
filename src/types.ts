@@ -54,6 +54,7 @@ export const ProjectFormSchema = z.union([
 export type FoxConfigProject = {
 	ecosystem?: ProjectEcosystem;
 	form?: ProjectForm;
+	status?: "dev" | "alpha" | "beta" | "release";
 };
 export const FoxConfigProjectSchema = {
 	type: "object",
@@ -64,6 +65,10 @@ export const FoxConfigProjectSchema = {
 		},
 		form: {
 			type: "string",
+		},
+		status: {
+			type: "string",
+			enum: ["dev", "alpha", "beta", "release"],
 		},
 	},
 };
@@ -108,12 +113,15 @@ export const FoxConfigGlobalSchema = {
 export type FoxModule = {
 	name: string;
 	activateOn: {
-		ecosystem: string;
-		form: string;
+		ecosystem: ProjectEcosystem | "ALL";
+		form: ProjectForm | "ALL";
 	};
-	match?: Map<string, (opts: FoxModuleOptions, entry: fs.WalkEntry) => void>;
+	match?: Map<
+		string,
+		(opts: FoxModuleOptions, entry: fs.WalkEntry, notices: Notice[]) => void
+	>;
 	triggers?: {
-		onInitial: (opts: FoxModuleOptions) => void;
+		onInitial: (opts: FoxModuleOptions, notices: Notice[]) => void;
 	};
 };
 
@@ -121,7 +129,11 @@ export type FoxModuleOptions = {
 	fix?: "no" | "prompt" | "yes";
 };
 
-export type LintRule = {
+export type Notice = {
 	name: string;
 	description: string;
+	position?: {
+		row?: number;
+		column?: number;
+	};
 };
