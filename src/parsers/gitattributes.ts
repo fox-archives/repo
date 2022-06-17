@@ -49,7 +49,7 @@ export function parseGitattributes(text: string) {
 
 export function separateGitattributes(
 	lines: GitAttributeLine[],
-	problems: types.LintRule[]
+	problems: types.Notice[]
 ) {
 	const foxxyAttributes: GitAttributeLine[] = [];
 	const otherAttributes: GitAttributeLine[] = [];

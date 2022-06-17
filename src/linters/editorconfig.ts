@@ -12,8 +12,6 @@ export default {
 	},
 	triggers: {
 		async onInitial(opts: types.FoxModuleOptions, notices: types.Notice[]) {
-			const problems: types.LintRule[] = [];
-
 			if (opts.fix) {
 				await fs.ensureFile(".editorconfig");
 			}
