@@ -1,4 +1,4 @@
-import { fs, toml, Ajv, path, z } from "../deps.ts";
+import { fs, toml, Ajv, path, z, flags } from "../deps.ts";
 
 import * as types from "../types.ts";
 
@@ -69,6 +69,20 @@ export function validateZod<T>(schema: z.ZodType, data: unknown) {
 	}
 
 	return data as T;
+}
+
+// TODO: cleanup
+export function validateFlags(args: flags.Args): Readonly<{ fix?: boolean }> {
+	delete (args as any)._;
+	// TODO: this treats all subcommands the same
+	const possibleKeys = ["fix"];
+	for (const key of Object.keys(args)) {
+		if (!possibleKeys.includes(key)) {
+			die(`Error: Flag ${key} is not valid`);
+		}
+	}
+
+	return Object.freeze(args as { fix?: boolean });
 }
 
 export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
@@ -194,7 +208,7 @@ export async function exec(
 }
 
 export function showHelp() {
-	console.log(`foxxy
+	console.log(`Name: foxxy
 
 Summary: Task automater and general linter
 

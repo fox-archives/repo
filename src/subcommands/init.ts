@@ -4,7 +4,7 @@ import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 import * as types from "../types.ts";
 
-export async function foxInit(args: flags.Args) {
+export async function foxInit() {
 	const foxConfigGlobal = await helper.getFoxConfigGlobal();
 
 	const ctx = await (async (): Promise<

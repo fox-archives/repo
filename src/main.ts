@@ -11,7 +11,7 @@ import { foxRelease } from "./subcommands/release.ts";
 await main();
 async function main() {
 	const args = flags.parse(Deno.args);
-	if ("h" in args || "help" in args || args._.length === 0) {
+	if ("h" in args || "help" in args) {
 		util.showHelp();
 		Deno.exit(0);
 	}
@@ -19,21 +19,27 @@ async function main() {
 	const subcommand = args._[0];
 	switch (subcommand) {
 		case "init": {
-			await foxInit(args);
+			await foxInit();
 			break;
 		}
 		case "lint": {
-			await foxLint(args);
+			const f = util.validateFlags(args);
+
+			await foxLint(f);
 			break;
 		}
 		case "docs": {
-			await foxDocs(args);
+			await foxDocs();
 			break;
 		}
 		case "release": {
-			await foxRelease(args);
+			await foxRelease();
 			break;
 		}
+		case "":
+			util.showHelp();
+			util.die("Must supply a subcommand");
+			break;
 		default:
 			util.showHelp();
 			util.die("Subcommand not found");

@@ -16,10 +16,10 @@ export default {
 				await fs.ensureFile(".editorconfig");
 			}
 
-			const content = await Deno.readTextFile(".editorconfig");
-			if (content.trim().length == 0) {
-				throw new Error(".editorconfig file cannot be empty"); // FIXME
-			}
+			// const content = await Deno.readTextFile(".editorconfig");
+			// if (content.trim().length == 0) {
+			// 	throw new Error(".editorconfig file cannot be empty"); // FIXME
+			// }
 		},
 	},
 };

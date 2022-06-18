@@ -19,7 +19,7 @@ export async function performLint(ctx: types.Context) {
 	}
 
 	const notices: types.Notice | [] = [];
-	const foxOptions: types.FoxModuleOptions = {};
+	const foxOptions: types.FoxModuleOptions = { fix: "yes" };
 	for (const module of moduleList) {
 		if (module.triggers?.onInitial) {
 			console.log(`Executing: ${module.name}::onInitial()`);

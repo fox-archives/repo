@@ -1,11 +1,11 @@
-import { flags, c, fs, path } from "../deps.ts";
+import { c, fs, path } from "../deps.ts";
 
 import * as types from "../types.ts";
 import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 import * as projectUtils from "../util/projectUtils.ts";
 
-export async function foxLint(args: flags.Args) {
+export async function foxLint(flags: { fix?: boolean }) {
 	const ctx = await helper.getContext();
 	const foxConfig = await helper.getFoxConfigLocal();
 
