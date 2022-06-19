@@ -10,27 +10,23 @@ await new Command()
 	.description("My task automator")
 	.version("v0.1.0")
 	.command("init", "Initializes")
-	.action(async (obj) => {
-		console.log("init", obj);
+	.action(async () => {
 		await foxInit();
 	})
 	.reset()
 	.command("lint", "Lints")
 	.option("--fix", "Fix mistakes")
-	.action(async (obj) => {
-		console.log("lints", obj);
-		await foxLint(obj);
+	.action(async (args) => {
+		await foxLint(args);
 	})
 	.reset()
 	.command("docs", "Generate documentation")
-	.action(async (obj) => {
-		console.log("docs", obj);
+	.action(async () => {
 		await foxDocs();
 	})
 	.reset()
 	.command("release", "Releases")
-	.action(async (obj) => {
-		console.log("docs", obj);
+	.action(async () => {
 		await foxRelease();
 	})
 	.reset()

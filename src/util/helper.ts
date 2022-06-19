@@ -7,7 +7,7 @@ import { foxLinterModules } from "../linters/index.ts";
 
 export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 	const moduleList = [];
-	for (const module of foxLinterModules as types.FoxModule[]) {
+	for (const module of foxLinterModules) {
 		if (
 			(module.activateOn.ecosystem === "any" ||
 				module.activateOn.ecosystem === ctx.ecosystem) &&
