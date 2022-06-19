@@ -11,7 +11,7 @@ export default {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.FoxModuleOptions, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
 			// TODO: ensure it is one of the licenses approved by me for meeeee~
 			if (await fs.exists("LICENSE.md")) return;
 

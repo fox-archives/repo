@@ -1,11 +1,11 @@
-import { fs, path, Ajv } from "../deps.ts";
+import { fs, path } from "../deps.ts";
 
 import * as types from "../types.ts";
 import * as util from "./util.ts";
 import * as projectUtils from "./projectUtils.ts";
 import { foxLinterModules } from "../linters/index.ts";
 
-export async function performLint(ctx: types.Context) {
+export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 	const moduleList = [];
 	for (const module of foxLinterModules as types.FoxModule[]) {
 		if (
@@ -19,11 +19,10 @@ export async function performLint(ctx: types.Context) {
 	}
 
 	const notices: types.Notice | [] = [];
-	const foxOptions: types.FoxModuleOptions = { fix: "yes" };
 	for (const module of moduleList) {
 		if (module.triggers?.onInitial) {
 			console.log(`Executing: ${module.name}::onInitial()`);
-			await module.triggers.onInitial(foxOptions, notices);
+			await module.triggers.onInitial(args, notices);
 		}
 	}
 	// FIXME: use path.joinGlobs to autofilter
@@ -38,7 +37,7 @@ export async function performLint(ctx: types.Context) {
 			for (const [glob, fn] of module.match) {
 				if (entry.path.match(path.globToRegExp(glob))) {
 					console.log(`Executing: ${module.name}::${glob}`);
-					await fn(foxOptions, entry, notices);
+					await fn(args, entry, notices);
 				}
 			}
 		}

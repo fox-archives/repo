@@ -10,7 +10,7 @@ export default {
 		[
 			"package.json",
 			(
-				opts: types.FoxModuleOptions,
+				opts: types.foxLintArgs,
 				entry: fs.WalkEntry,
 				notices: types.Notice[]
 			) => {
@@ -23,7 +23,7 @@ export default {
 		[
 			".prettierrc.json",
 			(
-				opts: types.FoxModuleOptions,
+				opts: types.foxLintArgs,
 				entry: fs.WalkEntry,
 				notices: types.Notice[]
 			) => {
@@ -34,7 +34,7 @@ export default {
 		[
 			"@(.prettierrc|.prettierrc.yml|.prettierrc.yaml|.prettierrc.json5|.prettierrc.js|.prettierrc.cjs|prettier.config.js|prettier.config.cjs|.prettierrc.toml)",
 			(
-				opts: types.FoxModuleOptions,
+				opts: types.foxLintArgs,
 				entry: fs.WalkEntry,
 				notices: types.Notice[]
 			) => {

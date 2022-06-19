@@ -14,7 +14,7 @@ export default {
 		[
 			"basalt.toml",
 			async (
-				opts: types.FoxModuleOptions,
+				opts: types.foxLintArgs,
 				entry: fs.WalkEntry,
 				notices: types.Notice[]
 			) => {

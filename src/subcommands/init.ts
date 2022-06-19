@@ -158,7 +158,7 @@ func main() {
 
 	// Run foxLint
 	if (util.saysYesTo("Run linter?")) {
-		helper.performLint(ctx);
+		helper.performLint(ctx, { fix: true });
 	}
 
 	// Initialize Git

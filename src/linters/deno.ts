@@ -13,7 +13,7 @@ export default {
 		[
 			"deno.json",
 			async (
-				opts: types.FoxModuleOptions,
+				opts: types.foxLintArgs,
 				entry: fs.WalkEntry,
 				notices: types.Notice[]
 			) => {

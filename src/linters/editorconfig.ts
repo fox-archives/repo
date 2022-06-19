@@ -11,7 +11,7 @@ export default {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.FoxModuleOptions, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
 			if (opts.fix) {
 				await fs.ensureFile(".editorconfig");
 			}

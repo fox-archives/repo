@@ -9,7 +9,7 @@ export default {
 		ecosystem: "any",
 		form: "any",
 	},
-	async onInitial(opts: types.FoxModuleOptions, notices: types.Notice[]) {
+	async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
 		if (!(await fs.exists(".hookah"))) {
 			notices.push({
 				name: "no-hookah",

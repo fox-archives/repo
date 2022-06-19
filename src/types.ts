@@ -1,5 +1,11 @@
 import { fs, z } from "./deps.ts";
 
+/* -------------------- Command Line -------------------- */
+
+export interface foxLintArgs {
+	fix?: boolean;
+}
+
 /* ----------------------- Context ---------------------- */
 export type GitRemoteInfo =
 	| {
@@ -118,15 +124,11 @@ export type FoxModule = {
 	};
 	match?: Map<
 		string,
-		(opts: FoxModuleOptions, entry: fs.WalkEntry, notices: Notice[]) => void
+		(opts: foxLintArgs, entry: fs.WalkEntry, notices: Notice[]) => void
 	>;
 	triggers?: {
-		onInitial: (opts: FoxModuleOptions, notices: Notice[]) => void;
+		onInitial: (opts: foxLintArgs, notices: Notice[]) => void;
 	};
-};
-
-export type FoxModuleOptions = {
-	fix?: "no" | "prompt" | "yes";
 };
 
 export type Notice = {

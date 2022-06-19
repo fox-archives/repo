@@ -5,7 +5,7 @@ import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 import * as projectUtils from "../util/projectUtils.ts";
 
-export async function foxLint(flags: { fix?: boolean }) {
+export async function foxLint(args: types.foxLintArgs) {
 	const ctx = await helper.getContext();
 	const foxConfig = await helper.getFoxConfigLocal();
 
@@ -21,5 +21,5 @@ export async function foxLint(flags: { fix?: boolean }) {
 	}
 	console.log(`Form: ${form}`);
 
-	await helper.performLint(ctx);
+	await helper.performLint(ctx, args);
 }
