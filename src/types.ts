@@ -117,6 +117,7 @@ export const FoxConfigGlobalSchema = {
 /* ------------------ Fox Linter Module ----------------- */
 
 export type FoxModule = {
+	id: string;
 	name: string;
 	activateOn: {
 		ecosystem: Omit<ProjectEcosystem, "unknown"> | "any";

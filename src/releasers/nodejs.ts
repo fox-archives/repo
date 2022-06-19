@@ -1,4 +1,5 @@
 import * as helper from "../util/helper.ts";
+import * as types from "../types.ts";
 
 export default {
 	id: "nodejs",

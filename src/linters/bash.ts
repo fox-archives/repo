@@ -1,4 +1,10 @@
-export default {
+import { fs, asserts } from "../deps.ts";
+
+import * as util from "../util/util.ts";
+import * as types from "../types.ts";
+
+export { module };
+const module: types.FoxModule = {
 	id: "bash",
 	name: "Bash",
 	activateOn: {
@@ -6,6 +12,7 @@ export default {
 		form: "any",
 	},
 };
+
 // import { fs } from "../deps.ts";
 // import { toml } from "../deps.ts";
 

@@ -9,7 +9,8 @@ import {
 	GitAttributeLine,
 } from "../parsers/gitattributes.ts";
 
-export default {
+export { module };
+const module: types.FoxModule = {
 	id: "git",
 	name: "Git",
 	activateOn: {

@@ -9,10 +9,9 @@ export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 	const moduleList = [];
 	for (const module of foxLinterModules as types.FoxModule[]) {
 		if (
-			(module.activateOn?.ecosystem === "any" ||
-				module.activateOn?.ecosystem === ctx.ecosystem) &&
-			(module.activateOn?.form === "any" ||
-				module.activateOn?.form === ctx.form)
+			(module.activateOn.ecosystem === "any" ||
+				module.activateOn.ecosystem === ctx.ecosystem) &&
+			(module.activateOn.form === "any" || module.activateOn.form === ctx.form)
 		) {
 			moduleList.push(module);
 		}

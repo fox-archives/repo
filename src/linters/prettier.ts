@@ -3,9 +3,14 @@ import { fs, asserts } from "../deps.ts";
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
 
-export default {
+export { module };
+const module: types.FoxModule = {
 	id: "prettier",
 	name: "Prettier",
+	activateOn: {
+		ecosystem: "any",
+		form: "any",
+	},
 	match: new Map([
 		[
 			"package.json",

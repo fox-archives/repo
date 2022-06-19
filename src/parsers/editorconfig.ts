@@ -73,7 +73,7 @@ function stringifyFunc(obj: INIObject): string {
 	return str;
 }
 
-export default {
+const module: types.FoxModule = {
 	parse: parseFunc,
 	stringify: stringifyFunc,
 } as UserINIObject;
