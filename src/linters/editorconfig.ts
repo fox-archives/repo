@@ -12,7 +12,7 @@ const module: types.FoxModule = {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs) {
 			if (opts.fix) {
 				await fs.ensureFile(".editorconfig");
 			}

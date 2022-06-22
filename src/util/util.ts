@@ -2,6 +2,10 @@ import { fs, toml, Ajv, path, z, flags } from "../deps.ts";
 
 import * as types from "../types.ts";
 
+export function pathExists(filePath: string) {
+	return fs.exists(filePath);
+}
+
 export function die(msg: string): never {
 	logError(`${msg}. Exiting`);
 	Deno.exit(1);
@@ -22,6 +26,56 @@ export function assertInstanceOfError(err: unknown) {
 
 	return err;
 }
+
+export async function maybeReadFile(file: string): Promise<[boolean, string]> {
+	let hasFile = false;
+	let text = "";
+	try {
+		hasFile = true;
+		text = await Deno.readTextFile(file);
+	} catch (unknownError: unknown) {
+		const err = assertInstanceOfError(unknownError);
+		if (!(err instanceof Deno.errors.NotFound)) {
+			throw err;
+		}
+	}
+
+	return [hasFile, text];
+}
+
+// TODO: naming
+export async function mustReadFile(file: string) {
+	try {
+		const text = await Deno.readTextFile(file);
+		return text;
+	} catch (unknownError) {
+		const err = assertInstanceOfError(unknownError);
+		die(`Failed to read file: ${file} (${err.name})`);
+	}
+}
+
+export async function mustRemoveFile(file: string) {
+	try {
+		await Deno.remove(file);
+	} catch (unknownError: unknown) {
+		const err = assertInstanceOfError(unknownError);
+		if (!(err instanceof Deno.errors.NotFound)) {
+			throw err;
+		}
+	}
+}
+
+export async function mustRemoveDirectory(directory: string) {
+	try {
+		await Deno.remove(directory, { recursive: true });
+	} catch (unknownError: unknown) {
+		const err = assertInstanceOfError(unknownError);
+		if (!(err instanceof Deno.errors.NotFound)) {
+			throw err;
+		}
+	}
+}
+
 export function saysYesTo(msg: string): boolean {
 	const input = prompt(msg);
 	if (input && /^y/iu.test(input)) {
@@ -30,6 +84,8 @@ export function saysYesTo(msg: string): boolean {
 
 	return false;
 }
+
+export function lintObject() {}
 
 export async function hasPath(glob: string) {
 	let exists = false;

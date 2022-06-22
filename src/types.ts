@@ -87,6 +87,7 @@ export type FoxConfigGlobal = {
 	};
 	github_token: string;
 };
+// TODO: remove duplication fox.schema.json
 export const FoxConfigGlobalSchema = {
 	type: "object",
 	additionalProperties: false,

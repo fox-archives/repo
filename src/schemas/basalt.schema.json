@@ -1,0 +1,30 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["type", "name", "slug", "version", "authors", "description"],
+	"properties": {
+		"type": {
+			"type": "string",
+			"enum": ["app", "lib"]
+		},
+		"name": {
+			"type": "string"
+		},
+		"slug": {
+			"type": "string"
+		},
+		"version": {
+			"type": "string"
+		},
+		"authors": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"description": {
+			"type": "string"
+		}
+	}
+}

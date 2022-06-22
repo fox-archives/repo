@@ -14,8 +14,9 @@ const module: types.FoxModule = {
 	triggers: {
 		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
 			// TODO: ensure it is one of the licenses approved by me for meeeee~
-			if (await fs.exists("LICENSE.md")) return;
+			if (await util.pathExists("LICENSE.md")) return;
 
+			// TODO: https://github.com/licensee/licensee
 			// TODO: logging
 			try {
 				await Deno.rename("license.md", "LICENSE.md");

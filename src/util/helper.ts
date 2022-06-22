@@ -80,7 +80,7 @@ export async function cdToProjectRoot() {
 		let potentialFile;
 		do {
 			potentialFile = path.join(dir, name);
-			if (await fs.exists(potentialFile)) {
+			if (await util.pathExists(potentialFile)) {
 				return dir;
 			}
 			dir = path.dirname(dir);
