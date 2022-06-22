@@ -71,20 +71,6 @@ export function validateZod<T>(schema: z.ZodType, data: unknown) {
 	return data as T;
 }
 
-// TODO: cleanup
-export function validateFlags(args: flags.Args): Readonly<{ fix?: boolean }> {
-	delete (args as any)._;
-	// TODO: this treats all subcommands the same
-	const possibleKeys = ["fix"];
-	for (const key of Object.keys(args)) {
-		if (!possibleKeys.includes(key)) {
-			die(`Error: Flag ${key} is not valid`);
-		}
-	}
-
-	return Object.freeze(args as { fix?: boolean });
-}
-
 export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
 	const result = await exec(
 		{
@@ -145,8 +131,18 @@ export async function readConfig(
 	name: string
 ): Promise<Record<string, unknown>> {
 	try {
-		const foxJson = await Deno.readTextFile(path.join(dir, name + ".json"));
-		return JSON.parse(foxJson);
+		const jsonFile = path.join(dir, name + ".json");
+		const foxJson = await Deno.readTextFile(jsonFile);
+
+		try {
+			return JSON.parse(foxJson);
+		} catch (errUnknown: unknown) {
+			const err = assertInstanceOfError(errUnknown);
+
+			if (err instanceof SyntaxError) {
+				die(`SyntaxError when parsing file ${jsonFile}`);
+			}
+		}
 	} catch (errUnknown: unknown) {
 		const err = assertInstanceOfError(errUnknown);
 		if (!(err instanceof Deno.errors.NotFound)) {
@@ -164,7 +160,7 @@ export async function readConfig(
 		}
 	}
 
-	return {};
+	die(`Failed to find a config file named ${name} in directory ${dir}`);
 }
 
 export async function exec(

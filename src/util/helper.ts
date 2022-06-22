@@ -110,7 +110,7 @@ export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 	const foxConfigDir = path.join(
 		Deno.env.get("XDG_CONFIG_HOME") ||
 			path.join(Deno.env.get("HOME") || "/WINDOWS_NOT_SUPPORTED", ".config"),
-		"fox"
+		"foxxy"
 	);
 
 	const json = await util.readConfig(foxConfigDir, "config");
