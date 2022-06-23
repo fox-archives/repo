@@ -20,22 +20,22 @@ export async function determineEcosystem(
 	Deno.chdir(dir);
 
 	const ecosystem = await (async () => {
-		if (await fs.exists(EcosystemFiles.nodePackageJson)) {
+		if (await util.pathExists(EcosystemFiles.nodePackageJson)) {
 			return "nodejs";
-		} else if (await fs.exists(EcosystemFiles.goMod)) {
+		} else if (await util.pathExists(EcosystemFiles.goMod)) {
 			return "go";
 		} else if (
-			(await fs.exists(EcosystemFiles.denoJson)) ||
-			(await fs.exists(EcosystemFiles.denoModTs))
+			(await util.pathExists(EcosystemFiles.denoJson)) ||
+			(await util.pathExists(EcosystemFiles.denoModTs))
 		) {
 			return "deno";
-		} else if (await fs.exists(EcosystemFiles.cargoToml)) {
+		} else if (await util.pathExists(EcosystemFiles.cargoToml)) {
 			return "rust";
-		} else if (await fs.exists(EcosystemFiles.gradleBuild)) {
+		} else if (await util.pathExists(EcosystemFiles.gradleBuild)) {
 			return "gradle";
 		} else if (await util.hasPath("*.nimble")) {
 			return "nim";
-		} else if (await fs.exists(EcosystemFiles.basaltToml)) {
+		} else if (await util.pathExists(EcosystemFiles.basaltToml)) {
 			return "basalt";
 		} else {
 			return "unknown";

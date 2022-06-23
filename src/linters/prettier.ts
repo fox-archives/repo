@@ -1,5 +1,6 @@
 import { fs, asserts } from "../deps.ts";
 
+import * as lintUtils from "../util/lintUtils.ts";
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
 
@@ -17,21 +18,21 @@ const module: types.FoxModule = {
 		[
 			"package.json",
 			(opts: types.foxLintArgs, entry: fs.WalkEntry) => {
-				const packageJson = JSON.parse(entry.path);
-				if (packageJson?.prettier) {
-					lintPrettierConfig(packageJson);
-				}
-
-				return [];
+				// TODO: only support .prettierrc.json
+				// const packageJson = JSON.parse(entry.path);
+				// if (packageJson?.prettier) {
+				// 	const expected = getExpected();
+				// 	const actualConfig = packageJson.prettier;
+				// 	lintUtils.validateValuesAgainst(expected, actualConfig);
+				// }
 			},
 		],
 		[
 			".prettierrc.json",
 			(opts: types.foxLintArgs, entry: fs.WalkEntry) => {
-				const prettierConfig = JSON.parse(entry.path);
-				lintPrettierConfig(prettierConfig);
-
-				return [];
+				const expected = getExpected();
+				const actualConfig = JSON.parse(entry.path);
+				lintUtils.validateValuesAgainst(expected, actualConfig);
 			},
 		],
 		[
@@ -45,12 +46,11 @@ const module: types.FoxModule = {
 	]),
 };
 
-function lintPrettierConfig(prettierConfig: unknown) {
-	const expected = {
+function getExpected() {
+	return {
 		useTabs: true,
 		semi: false,
 		singleQuote: true,
 		trailingComma: "all",
 	};
-	asserts.assertEquals(expected, prettierConfig);
 }

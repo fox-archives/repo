@@ -2,6 +2,10 @@ import { fs, toml, Ajv, path, z, flags } from "../deps.ts";
 
 import * as types from "../types.ts";
 
+export function pathExists(filePath: string) {
+	return fs.exists(filePath);
+}
+
 export function die(msg: string): never {
 	logError(`${msg}. Exiting`);
 	Deno.exit(1);
@@ -22,6 +26,56 @@ export function assertInstanceOfError(err: unknown) {
 
 	return err;
 }
+
+export async function maybeReadFile(file: string): Promise<[boolean, string]> {
+	let hasFile = false;
+	let text = "";
+	try {
+		hasFile = true;
+		text = await Deno.readTextFile(file);
+	} catch (unknownError: unknown) {
+		const err = assertInstanceOfError(unknownError);
+		if (!(err instanceof Deno.errors.NotFound)) {
+			throw err;
+		}
+	}
+
+	return [hasFile, text];
+}
+
+// TODO: naming
+export async function mustReadFile(file: string) {
+	try {
+		const text = await Deno.readTextFile(file);
+		return text;
+	} catch (unknownError) {
+		const err = assertInstanceOfError(unknownError);
+		die(`Failed to read file: ${file} (${err.name})`);
+	}
+}
+
+export async function mustRemoveFile(file: string) {
+	try {
+		await Deno.remove(file);
+	} catch (unknownError: unknown) {
+		const err = assertInstanceOfError(unknownError);
+		if (!(err instanceof Deno.errors.NotFound)) {
+			throw err;
+		}
+	}
+}
+
+export async function mustRemoveDirectory(directory: string) {
+	try {
+		await Deno.remove(directory, { recursive: true });
+	} catch (unknownError: unknown) {
+		const err = assertInstanceOfError(unknownError);
+		if (!(err instanceof Deno.errors.NotFound)) {
+			throw err;
+		}
+	}
+}
+
 export function saysYesTo(msg: string): boolean {
 	const input = prompt(msg);
 	if (input && /^y/iu.test(input)) {
@@ -30,6 +84,8 @@ export function saysYesTo(msg: string): boolean {
 
 	return false;
 }
+
+export function lintObject() {}
 
 export async function hasPath(glob: string) {
 	let exists = false;
@@ -69,20 +125,6 @@ export function validateZod<T>(schema: z.ZodType, data: unknown) {
 	}
 
 	return data as T;
-}
-
-// TODO: cleanup
-export function validateFlags(args: flags.Args): Readonly<{ fix?: boolean }> {
-	delete (args as any)._;
-	// TODO: this treats all subcommands the same
-	const possibleKeys = ["fix"];
-	for (const key of Object.keys(args)) {
-		if (!possibleKeys.includes(key)) {
-			die(`Error: Flag ${key} is not valid`);
-		}
-	}
-
-	return Object.freeze(args as { fix?: boolean });
 }
 
 export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
@@ -145,8 +187,18 @@ export async function readConfig(
 	name: string
 ): Promise<Record<string, unknown>> {
 	try {
-		const foxJson = await Deno.readTextFile(path.join(dir, name + ".json"));
-		return JSON.parse(foxJson);
+		const jsonFile = path.join(dir, name + ".json");
+		const foxJson = await Deno.readTextFile(jsonFile);
+
+		try {
+			return JSON.parse(foxJson);
+		} catch (errUnknown: unknown) {
+			const err = assertInstanceOfError(errUnknown);
+
+			if (err instanceof SyntaxError) {
+				die(`SyntaxError when parsing file ${jsonFile}`);
+			}
+		}
 	} catch (errUnknown: unknown) {
 		const err = assertInstanceOfError(errUnknown);
 		if (!(err instanceof Deno.errors.NotFound)) {
@@ -164,7 +216,7 @@ export async function readConfig(
 		}
 	}
 
-	return {};
+	die(`Failed to find a config file named ${name} in directory ${dir}`);
 }
 
 export async function exec(

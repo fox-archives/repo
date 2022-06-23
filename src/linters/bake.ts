@@ -13,20 +13,21 @@ const module: types.FoxModule = {
 	},
 	triggers: {
 		async onInitial(opts: types.foxLintArgs) {
+			const notices: types.NoticeReturn[] = [];
 			const file = "./Bakefile.sh";
 
-			try {
-				const text = await Deno.readTextFile(file);
-				for (const line of text.split("\n")) {
-					if (line.includes("task.fmt()")) {
-						util.logInfo("Use task.format() instead of task.fmt()");
-					}
-				}
-			} catch (unknownError: unknown) {
-				const err = util.assertInstanceOfError(unknownError);
+			const [hasFile, text] = await util.maybeReadFile(file);
+			if (!hasFile) {
+				notices.push({
+					name: "bakefile-required",
+					description: "A Bakefile.sh must be present",
+				});
+				return notices;
+			}
 
-				if (!(err instanceof Deno.errors.NotFound)) {
-					throw err;
+			for (const line of text.split("\n")) {
+				if (line.includes("task.fmt()")) {
+					util.logInfo("Use task.format() instead of task.fmt()");
 				}
 			}
 

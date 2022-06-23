@@ -1,5 +1,6 @@
 import { fs } from "../deps.ts";
 
+import * as util from "../util/util.ts";
 import * as types from "../types.ts";
 
 export { module };

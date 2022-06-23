@@ -100,7 +100,7 @@ export async function cdToProjectRoot() {
 		let potentialFile;
 		do {
 			potentialFile = path.join(dir, name);
-			if (await fs.exists(potentialFile)) {
+			if (await util.pathExists(potentialFile)) {
 				return dir;
 			}
 			dir = path.dirname(dir);
@@ -130,7 +130,7 @@ export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 	const foxConfigDir = path.join(
 		Deno.env.get("XDG_CONFIG_HOME") ||
 			path.join(Deno.env.get("HOME") || "/WINDOWS_NOT_SUPPORTED", ".config"),
-		"fox"
+		"foxxy"
 	);
 
 	const json = await util.readConfig(foxConfigDir, "config");
