@@ -4,8 +4,7 @@ import * as lintUtils from "../util/lintUtils.ts";
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
 
-export { module };
-const module: types.FoxModule = {
+export const module: types.FoxModule = {
 	id: "basalt",
 	name: "Basalt",
 	activateOn: {

@@ -2,8 +2,7 @@ import { fs, asserts } from "../deps.ts";
 
 import * as types from "../types.ts";
 
-export { module };
-const module: types.FoxModule = {
+export const module: types.FoxModule = {
 	id: "deno",
 	name: "Deno",
 	activateOn: {

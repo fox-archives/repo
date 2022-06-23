@@ -3,8 +3,7 @@ import { fs } from "../deps.ts";
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
 
-export { module };
-const module: types.FoxModule = {
+export const module: types.FoxModule = {
 	id: "license",
 	name: "License",
 	activateOn: {
