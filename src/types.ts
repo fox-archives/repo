@@ -125,16 +125,22 @@ export type FoxModule = {
 	};
 	match?: Map<
 		string,
-		(opts: foxLintArgs, entry: fs.WalkEntry, notices: Notice[]) => void
+		(
+			opts: foxLintArgs,
+			entry: fs.WalkEntry
+		) => Promise<NoticeReturn[] | undefined>
 	>;
 	triggers?: {
-		onInitial: (opts: foxLintArgs, notices: Notice[]) => void;
+		onInitial: (opts: foxLintArgs) => Promise<NoticeReturn[] | undefined>;
 	};
 };
 
+export type NoticeReturn = Omit<Notice, "moduleId">;
 export type Notice = {
+	moduleId: string;
 	name: string;
 	description: string;
+	file?: string;
 	position?: {
 		row?: number;
 		column?: number;

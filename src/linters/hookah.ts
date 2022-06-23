@@ -11,12 +11,15 @@ const module: types.FoxModule = {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs) {
+			const notices: types.NoticeReturn[] = [];
+
 			if (!(await fs.exists(".hookah"))) {
 				notices.push({
 					name: "no-hookah",
 					description: "Hookah must be installed",
 				});
+				return notices;
 			}
 		},
 	},

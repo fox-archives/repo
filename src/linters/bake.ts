@@ -12,7 +12,7 @@ const module: types.FoxModule = {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs) {
 			const file = "./Bakefile.sh";
 
 			try {
@@ -29,6 +29,8 @@ const module: types.FoxModule = {
 					throw err;
 				}
 			}
+
+			return [];
 		},
 	},
 };

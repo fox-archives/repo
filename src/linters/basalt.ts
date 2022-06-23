@@ -14,11 +14,7 @@ const module: types.FoxModule = {
 	match: new Map([
 		[
 			"basalt.toml",
-			async (
-				opts: types.foxLintArgs,
-				entry: fs.WalkEntry,
-				notices: types.Notice[]
-			) => {
+			async (opts: types.foxLintArgs, entry: fs.WalkEntry) => {
 				const basaltToml = toml.parse(await Deno.readTextFile(entry.path));
 
 				// const pkg = basaltToml.package as Record<string, any>;
@@ -56,6 +52,8 @@ const module: types.FoxModule = {
 				// 	util.logMissingProperty("package.description");
 				// }
 				// util.ensureNotEmpty("package.type", pkg.description);
+
+				return [];
 			},
 		],
 	]),

@@ -12,7 +12,7 @@ const module: types.FoxModule = {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs) {
 			try {
 				await Deno.remove("glue.toml");
 			} catch (unknownError: unknown) {
@@ -30,6 +30,8 @@ const module: types.FoxModule = {
 					throw err;
 				}
 			}
+
+			return [];
 		},
 	},
 };

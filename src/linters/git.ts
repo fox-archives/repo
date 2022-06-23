@@ -18,13 +18,14 @@ const module: types.FoxModule = {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs) {
 			if (opts.fix) {
 				await fs.ensureFile(".gitattributes");
 			}
 
 			const text = await Deno.readTextFile(".gitattributes");
 			const parsed = parseGitattributes(text);
+			const notices: types.NoticeReturn[] = [];
 			const { foxxyAttributes, otherAttributes } = separateGitattributes(
 				parsed,
 				notices
@@ -133,6 +134,8 @@ const module: types.FoxModule = {
 			if (opts.fix) {
 				await Deno.writeTextFile(".gitattributes", finalText);
 			}
+
+			return notices;
 		},
 	},
 };

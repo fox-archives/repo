@@ -11,39 +11,35 @@ const module: types.FoxModule = {
 		ecosystem: "any",
 		form: "any",
 	},
+	// TODO // FIXME
+	// @ts-ignore
 	match: new Map([
 		[
 			"package.json",
-			(
-				opts: types.foxLintArgs,
-				entry: fs.WalkEntry,
-				notices: types.Notice[]
-			) => {
+			(opts: types.foxLintArgs, entry: fs.WalkEntry) => {
 				const packageJson = JSON.parse(entry.path);
 				if (packageJson?.prettier) {
 					lintPrettierConfig(packageJson);
 				}
+
+				return [];
 			},
 		],
 		[
 			".prettierrc.json",
-			(
-				opts: types.foxLintArgs,
-				entry: fs.WalkEntry,
-				notices: types.Notice[]
-			) => {
+			(opts: types.foxLintArgs, entry: fs.WalkEntry) => {
 				const prettierConfig = JSON.parse(entry.path);
 				lintPrettierConfig(prettierConfig);
+
+				return [];
 			},
 		],
 		[
 			"@(.prettierrc|.prettierrc.yml|.prettierrc.yaml|.prettierrc.json5|.prettierrc.js|.prettierrc.cjs|prettier.config.js|prettier.config.cjs|.prettierrc.toml)",
-			(
-				opts: types.foxLintArgs,
-				entry: fs.WalkEntry,
-				notices: types.Notice[]
-			) => {
+			(opts: types.foxLintArgs, entry: fs.WalkEntry) => {
 				console.log("not supported: " + entry.path); // TODO
+
+				return [];
 			},
 		],
 	]),

@@ -13,11 +13,7 @@ const module: types.FoxModule = {
 	match: new Map([
 		[
 			"deno.json",
-			async (
-				opts: types.foxLintArgs,
-				entry: fs.WalkEntry,
-				notices: types.Notice[]
-			) => {
+			async (opts: types.foxLintArgs, entry: fs.WalkEntry) => {
 				const denoJson = JSON.parse(await Deno.readTextFile(entry.path));
 				const expected = {
 					fmt: {
@@ -28,6 +24,8 @@ const module: types.FoxModule = {
 					},
 				};
 				asserts.assertEquals(expected, denoJson);
+
+				return [];
 			},
 		],
 	]),

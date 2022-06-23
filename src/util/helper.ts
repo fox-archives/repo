@@ -1,4 +1,4 @@
-import { fs, path } from "../deps.ts";
+import { fs, path, c } from "../deps.ts";
 
 import * as types from "../types.ts";
 import * as util from "./util.ts";
@@ -17,11 +17,16 @@ export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 		}
 	}
 
-	const notices: types.Notice | [] = [];
+	let notices: types.Notice[] = [];
 	for (const module of moduleList) {
 		if (module.triggers?.onInitial) {
 			console.log(`Executing: ${module.name}::onInitial()`);
-			await module.triggers.onInitial(args, notices);
+			const ns = await module.triggers.onInitial(args);
+			if (ns) {
+				notices = notices.concat(
+					ns.map((item) => ({ ...item, moduleId: module.id }))
+				);
+			}
 		}
 	}
 	// FIXME: use path.joinGlobs to autofilter
@@ -36,12 +41,27 @@ export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 			for (const [glob, fn] of module.match) {
 				if (entry.path.match(path.globToRegExp(glob))) {
 					console.log(`Executing: ${module.name}::${glob}`);
-					await fn(args, entry, notices);
+					const ns = await fn(args, entry);
+					if (ns) {
+						notices = notices.concat(
+							ns.map((item) => ({ ...item, moduleId: module.id }))
+						);
+					}
 				}
 			}
 		}
 	}
 
+	for (const notice of notices) {
+		if (!notice.file) {
+			console.log(`${c.underline(notice.name)}`);
+		}
+	}
+
+	for (const notice of notices) {
+		if (notice.file) {
+		}
+	}
 	if (notices.length > 0) {
 		console.log("NOTICES");
 		console.log(notices);

@@ -12,7 +12,7 @@ const module: types.FoxModule = {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs) {
 			// TODO: ensure it is one of the licenses approved by me for meeeee~
 			if (await fs.exists("LICENSE.md")) return;
 
@@ -26,6 +26,8 @@ const module: types.FoxModule = {
 					throw err;
 				}
 			}
+
+			return [];
 		},
 	},
 };

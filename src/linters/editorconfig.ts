@@ -12,7 +12,7 @@ const module: types.FoxModule = {
 		form: "any",
 	},
 	triggers: {
-		async onInitial(opts: types.foxLintArgs, notices: types.Notice[]) {
+		async onInitial(opts: types.foxLintArgs) {
 			if (opts.fix) {
 				await fs.ensureFile(".editorconfig");
 			}
@@ -21,6 +21,8 @@ const module: types.FoxModule = {
 			// if (content.trim().length == 0) {
 			// 	throw new Error(".editorconfig file cannot be empty"); // FIXME
 			// }
+
+			return [];
 		},
 	},
 };
