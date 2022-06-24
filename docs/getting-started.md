@@ -13,6 +13,9 @@ At `~/.config/foxxy/config.json`:
 		"email": "edwin@kofler.dev",
 		"websiteURL": "edwinkofler.com"
 	},
-	"github_token": ""
+	"github_token": "",
+	"defaults": {
+		"vcsOwner": "hyperupcall"
+	}
 }
 ```

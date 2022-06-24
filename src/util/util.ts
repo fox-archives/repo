@@ -1,4 +1,4 @@
-import { fs, toml, Ajv, path, z, flags } from "../deps.ts";
+import { fs, toml, Ajv, path, z, flags, Confirm } from "../deps.ts";
 
 import * as types from "../types.ts";
 
@@ -76,13 +76,26 @@ export async function mustRemoveDirectory(directory: string) {
 	}
 }
 
-export function saysYesTo(msg: string): boolean {
-	const input = prompt(msg);
-	if (input && /^y/iu.test(input)) {
-		return true;
-	}
+export async function writeButAskBeforeOverride(file: string, content: string) {
+	// const f = await Deno.open(file, { write: true, create: true });
+	// await f.write(new TextEncoder().encode(content));
 
-	return false;
+	// f.close();
+
+	// TODO
+	if (await fs.exists(file)) {
+		if (await Confirm.prompt(`Would you like to override file ${file}?`)) {
+			await Deno.writeTextFile(file, content);
+		}
+	} else {
+		await Deno.writeTextFile(file, content);
+	}
+}
+
+export async function writeButDoNotOverride(file: string, content: string) {
+	if (!(await fs.exists(file))) {
+		await Deno.writeTextFile(file, content);
+	}
 }
 
 export function lintObject() {}
@@ -104,7 +117,10 @@ export async function arrayFromAsync<T>(asyncItems: AsyncIterable<T>) {
 	return arr;
 }
 
-export function validateAjv<T>(schema: Record<string, unknown>, data: unknown) {
+export function validateAjv<T>(
+	schema: Record<string, unknown>,
+	data: Record<string, unknown>
+) {
 	const ajv = new Ajv();
 
 	const validate = ajv.compile(schema);
@@ -127,7 +143,7 @@ export function validateZod<T>(schema: z.ZodType, data: unknown) {
 	return data as T;
 }
 
-export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
+export async function getVcsInfo(): Promise<types.VcsInfo> {
 	const result = await exec(
 		{
 			cmd: ["git", "remote", "get-url", "origin"],
@@ -180,43 +196,6 @@ export async function getGitRemoteInfo(): Promise<types.GitRemoteInfo> {
 			die("Failed to recognize format of remote url");
 		}
 	}
-}
-
-export async function readConfig(
-	dir: string,
-	name: string
-): Promise<Record<string, unknown>> {
-	try {
-		const jsonFile = path.join(dir, name + ".json");
-		const foxJson = await Deno.readTextFile(jsonFile);
-
-		try {
-			return JSON.parse(foxJson);
-		} catch (errUnknown: unknown) {
-			const err = assertInstanceOfError(errUnknown);
-
-			if (err instanceof SyntaxError) {
-				die(`SyntaxError when parsing file ${jsonFile}`);
-			}
-		}
-	} catch (errUnknown: unknown) {
-		const err = assertInstanceOfError(errUnknown);
-		if (!(err instanceof Deno.errors.NotFound)) {
-			throw err;
-		}
-	}
-
-	try {
-		const foxToml = await Deno.readTextFile(path.join(dir, name + ".toml"));
-		return toml.parse(foxToml);
-	} catch (errUnknown: unknown) {
-		const err = assertInstanceOfError(errUnknown);
-		if (!(err instanceof Deno.errors.NotFound)) {
-			throw err;
-		}
-	}
-
-	die(`Failed to find a config file named ${name} in directory ${dir}`);
 }
 
 export async function exec(

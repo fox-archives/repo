@@ -2,7 +2,7 @@
 	"$schema": "http://json-schema.org/draft-04/schema",
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["person", "github_token"],
+	"required": ["person", "github_token", "defaults"],
 	"properties": {
 		"person": {
 			"type": "object",
@@ -22,6 +22,19 @@
 		},
 		"github_token": {
 			"type": "string"
+		},
+		"defaults": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["vcsOwner", "vcsSite"],
+			"properties": {
+				"vcsOwner": {
+					"type": "string"
+				},
+				"vcsSite": {
+					"type": "string"
+				}
+			}
 		}
 	}
 }

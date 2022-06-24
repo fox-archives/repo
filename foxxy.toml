@@ -1,0 +1,4 @@
+ecosystem = 'deno'
+form = 'app'
+for = 'me'
+status = 'experimental'

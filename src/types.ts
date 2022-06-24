@@ -7,7 +7,7 @@ export interface foxLintArgs {
 }
 
 /* ----------------------- Context ---------------------- */
-export type GitRemoteInfo =
+export type VcsInfo =
 	| {
 			site: string;
 			owner: string;
@@ -17,7 +17,7 @@ export type GitRemoteInfo =
 
 export type Context = {
 	dir: string;
-	git: GitRemoteInfo;
+	git: VcsInfo; // TODO: rename
 	ecosystem: ProjectEcosystem;
 	form: ProjectForm;
 	person: FoxConfigGlobal["person"];
@@ -60,11 +60,13 @@ export const ProjectFormSchema = z.union([
 export type FoxConfigProject = {
 	ecosystem?: ProjectEcosystem;
 	form?: ProjectForm;
-	status?: "dev" | "alpha" | "beta" | "release";
+	for?: "me" | "anyone";
+	status?: "experimental" | "should-work" | "maintained";
 };
 export const FoxConfigProjectSchema = {
 	type: "object",
 	additionalProperties: false,
+	required: ["ecosystem", "form", "for", "status"],
 	properties: {
 		ecosystem: {
 			type: "string",
@@ -72,9 +74,13 @@ export const FoxConfigProjectSchema = {
 		form: {
 			type: "string",
 		},
+		for: {
+			type: "string",
+			enum: ["me", "anyone"],
+		},
 		status: {
 			type: "string",
-			enum: ["dev", "alpha", "beta", "release"],
+			enum: ["experimental", "should-work", "maintained"],
 		},
 	},
 };
@@ -86,12 +92,16 @@ export type FoxConfigGlobal = {
 		websiteURL: string;
 	};
 	github_token: string;
+	defaults: {
+		vcsOwner: string;
+		vcsSite: string;
+	};
 };
 // TODO: remove duplication fox.schema.json
 export const FoxConfigGlobalSchema = {
 	type: "object",
 	additionalProperties: false,
-	required: ["person", "github_token"],
+	required: ["person", "github_token", "defaults"],
 	properties: {
 		person: {
 			type: "object",
@@ -111,6 +121,19 @@ export const FoxConfigGlobalSchema = {
 		},
 		github_token: {
 			type: "string",
+		},
+		defaults: {
+			type: "object",
+			additionalProperties: false,
+			required: ["vcsOwner", "vcsSite"],
+			properties: {
+				vcsOwner: {
+					type: "string",
+				},
+				vcsSite: {
+					type: "string",
+				},
+			},
 		},
 	},
 };

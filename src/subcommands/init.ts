@@ -1,71 +1,71 @@
-import { flags, fs, path } from "../deps.ts";
+import { flags, fs, path, Input, Confirm, Select } from "../deps.ts";
 
+import * as projectUtils from "../util/projectUtils.ts";
 import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 import * as types from "../types.ts";
 
 export async function foxInit() {
-	const foxConfigGlobal = await helper.getFoxConfigGlobal();
+	const foxxyConfigGlobal = await helper.getFoxConfigGlobal();
 
 	const ctx = await (async (): Promise<
 		types.Context & { git: NonNullable<types.Context["git"]> }
 	> => {
-		// Ecosystem
-		const projectEcosystem = util.validateZod<types.ProjectEcosystem>(
-			types.ProjectEcosystemSchema,
-			prompt("Project Ecosystem:") ||
-				util.die("Failed to specify project ecosystem")
-		);
+		const isDirEmpty = async (dir: string): Promise<boolean> => {
+			return (await util.arrayFromAsync(Deno.readDir(dir))).length === 0;
+		};
 
-		// Form
-		const projectForm = util.validateZod<types.ProjectForm>(
-			types.ProjectFormSchema,
-			prompt("Project Form:") || util.die("Failed to specify project form")
-		);
+		const projectDir = Deno.cwd();
+		let projectEcosystem: types.ProjectEcosystem;
+		let projectForm: types.ProjectForm;
 
-		// Dir
-		const projectDir = prompt("Project Directory:");
-		if (!projectDir) {
-			util.die("Failed to specify project directory");
-		}
-		try {
-			Deno.chdir(projectDir);
-		} catch (unknownError: unknown) {
-			const err = util.assertInstanceOfError(unknownError);
+		if (await isDirEmpty(projectDir)) {
+			projectEcosystem = util.validateZod<types.ProjectEcosystem>(
+				types.ProjectEcosystemSchema,
+				await Input.prompt({ message: "Project Ecosystem", minLength: 2 })
+			);
 
-			if (err instanceof Deno.errors.NotFound) {
-				await Deno.mkdir(projectDir, { recursive: true });
-				Deno.chdir(projectDir);
-			} else {
-				throw err;
+			projectForm = util.validateZod<types.ProjectForm>(
+				types.ProjectFormSchema,
+				await Input.prompt({ message: "Project Form", minLength: 2 })
+			);
+		} else {
+			let foxxyConfig: types.FoxConfigProject = {};
+			try {
+				foxxyConfig = await helper.getFoxConfigLocal();
+			} catch (unknownError: unknown) {
+				const err = util.assertInstanceOfError(unknownError);
+				if (!(err instanceof Deno.errors.NotFound)) {
+					throw err;
+				}
 			}
-		}
-		if ((await util.arrayFromAsync(Deno.readDir("."))).length !== 0) {
-			util.die("Specified project directory must be empty");
+
+			projectEcosystem = await projectUtils.determineEcosystem(projectDir);
+			projectForm = await projectUtils.determineForm(
+				foxxyConfig,
+				projectEcosystem
+			);
 		}
 
 		// Repo
-		const projectOwner = prompt("Repository Owner:");
-		if (!projectOwner) {
-			util.die("Repository owner cannot be empty");
-		}
-
-		// Repo
-		const projectRepo = prompt("Repository Name:");
+		const projectRepo = await Input.prompt({
+			message: "Repository Name",
+			minLength: 2,
+		});
 		if (!projectRepo) {
 			util.die("Repository name cannot be empty");
 		}
 
 		return {
-			dir: path.join(Deno.cwd(), projectDir),
+			dir: projectDir,
 			git: {
-				site: "github.com",
-				owner: projectOwner,
+				site: foxxyConfigGlobal.defaults.vcsSite,
+				owner: foxxyConfigGlobal.defaults.vcsOwner,
 				repo: projectRepo,
 			},
 			ecosystem: projectEcosystem,
 			form: projectForm,
-			...foxConfigGlobal,
+			...foxxyConfigGlobal,
 		};
 	})();
 
@@ -80,19 +80,8 @@ export async function foxInit() {
 		case "node":
 		case "nodejs": {
 			// Ecosystem
-			const packageJson = {
-				name: ctx.git.repo,
-				version: "0.1.0",
-				main: "index.js",
-				author: "Edwin Kofler <edwin@kofler.dev> (https://edwinkofler.com)",
-				license: "NOT LICENSED", // TODO
-				type: "module",
-			};
-			await Deno.writeTextFile(
-				"package.json",
-				`${JSON.stringify(packageJson, null, "\t")}\n`
-			);
-			await Deno.writeTextFile(
+			await util.writeButDoNotOverride("package.json", "{}");
+			await util.writeButDoNotOverride(
 				"index.js",
 				`import * as ft from '@hyperupcall/foxtrot-nodejs'\n\nft.woof()\n`
 			);
@@ -106,8 +95,11 @@ export async function foxInit() {
 		}
 		case "deno":
 			// Ecosystem
-			await Deno.writeTextFile("deno.jsonc", "{}\n");
-			await Deno.writeTextFile("main.ts", `console.log("Hello, World!")\n`);
+			await util.writeButDoNotOverride("deno.jsonc", "{}\n");
+			await util.writeButDoNotOverride(
+				"main.ts",
+				`console.log("Hello, World!")\n`
+			);
 
 			// General
 			bake.run = "deno run ./main.ts";
@@ -123,7 +115,7 @@ export async function foxInit() {
 					`github.com/${ctx.git.owner}/${ctx.git.repo}`,
 				],
 			});
-			await Deno.writeTextFile(
+			await util.writeButDoNotOverride(
 				"main.go",
 				`package main
 
@@ -144,27 +136,31 @@ func main() {
 	}
 
 	// General
-	let bakefileShContents = "# shellcheck shell=bash\n\n";
-	for (const [taskName, taskContent] of Object.entries(bake)) {
-		bakefileShContents += `task.${taskName}() {\n\t`;
-		bakefileShContents += taskContent.split("\n").join("\t\n");
-		bakefileShContents += `\n}\n`;
-	}
-	bakefileShContents += "\n";
-	await Deno.writeTextFile("Bakefile.sh", bakefileShContents);
+	const bakefileShContents = ((): string => {
+		let bakefileShContents = "# shellcheck shell=bash\n\n";
+
+		for (const [taskName, taskContent] of Object.entries(bake)) {
+			bakefileShContents += `task.${taskName}() {\n\t`;
+			bakefileShContents += taskContent.split("\n").join("\t\n");
+			bakefileShContents += `\n}\n`;
+		}
+		bakefileShContents += "\n";
+		return bakefileShContents;
+	})();
+	await util.writeButDoNotOverride("Bakefile.sh", bakefileShContents);
 	await util.exec({ cmd: ["bake"] }, { allowFailure: true });
 
-	await Deno.writeTextFile("README.md", `# ${ctx.git.repo}\n`);
+	await util.writeButDoNotOverride("README.md", `# ${ctx.git.repo}\n`);
 
-	// Run foxLint
-	if (util.saysYesTo("Run linter?")) {
+	// Run Linter
+	if (await Confirm.prompt("Run linter?")) {
 		helper.performLint(ctx, { fix: true });
 	}
 
 	// Initialize Git
-	if (util.saysYesTo("Initialize Git?")) {
+	if (!util.pathExists(".git") && (await Confirm.prompt("Initialize Git?"))) {
 		await util.exec({
-			cmd: ["git", "init", "--object-format", "sha256", "-b", "main"],
+			cmd: ["git", "init", "-b", "main"],
 		});
 		await util.exec({
 			cmd: [
@@ -172,16 +168,26 @@ func main() {
 				"remote",
 				"add",
 				"origin",
-				`git@github.com:${ctx.git.owner}/${ctx.git.repo}`,
+				`git@${ctx.git.site}:${ctx.git.owner}/${ctx.git.repo}`,
 			],
 		});
 
 		await util.exec({ cmd: ["git", "add", "-A"] });
-		await util.exec({ cmd: ["git", "commit", "-m", "chore: Initial commit"] });
+		await util.exec({
+			cmd: ["git", "commit", "-m", "chore: Initial commit"],
+		});
 	}
 
 	// Initialize GitHub
-	if (util.saysYesTo("Hook up GitHub")) {
+	const value = await Select.prompt({
+		message: "Create GitHub repository?",
+		options: [
+			{ name: "Public", value: "public" },
+			{ name: "Private", value: "private" },
+			{ name: "Neither", value: "none" },
+		],
+	});
+	if (value !== "none") {
 		await util.exec({
 			cmd: [
 				"gh",
@@ -189,7 +195,7 @@ func main() {
 				"create",
 				ctx.git.repo,
 				"--disable-wiki",
-				"--public",
+				value === "public" ? "--public" : "--private",
 				"--push",
 				"--remote",
 				"origin",
