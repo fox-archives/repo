@@ -2,17 +2,6 @@ import { fs, toml } from "../deps.ts";
 import * as util from "./util.ts";
 import * as types from "../types.ts";
 
-const enum EcosystemFiles {
-	nodePackageJson = "./package.json",
-	goMod = "./go.mod",
-	denoJson = "./deno.json",
-	denoModTs = "./mod.ts",
-	cargoToml = "./cargo.toml",
-	nimblePostfix = "./.nimble",
-	gradleBuild = "./gradle.build",
-	basaltToml = "./basalt.toml",
-}
-
 export async function determineEcosystem(
 	dir: string | URL
 ): Promise<types.ProjectEcosystem> {
@@ -20,22 +9,22 @@ export async function determineEcosystem(
 	Deno.chdir(dir);
 
 	const ecosystem = await (async () => {
-		if (await util.pathExists(EcosystemFiles.nodePackageJson)) {
+		if (await util.pathExists("./package.json")) {
 			return "nodejs";
-		} else if (await util.pathExists(EcosystemFiles.goMod)) {
+		} else if (await util.pathExists("./go.mod")) {
 			return "go";
 		} else if (
-			(await util.pathExists(EcosystemFiles.denoJson)) ||
-			(await util.pathExists(EcosystemFiles.denoModTs))
+			(await util.pathExists("./deno.json")) ||
+			(await util.pathExists("./mod.ts"))
 		) {
 			return "deno";
-		} else if (await util.pathExists(EcosystemFiles.cargoToml)) {
+		} else if (await util.pathExists("./cargo.toml")) {
 			return "rust";
-		} else if (await util.pathExists(EcosystemFiles.gradleBuild)) {
+		} else if (await util.pathExists("./gradle.build")) {
 			return "gradle";
 		} else if (await util.hasPath("*.nimble")) {
 			return "nim";
-		} else if (await util.pathExists(EcosystemFiles.basaltToml)) {
+		} else if (await util.pathExists("./basalt.toml")) {
 			return "basalt";
 		} else {
 			return "unknown";
@@ -57,9 +46,7 @@ export async function determineForm(
 
 	switch (ecosystemType) {
 		case "basalt": {
-			const content = toml.parse(
-				await Deno.readTextFile(EcosystemFiles.basaltToml)
-			);
+			const content = toml.parse(await Deno.readTextFile("./basalt.toml"));
 
 			const type = (content as any)?.package?.type;
 
