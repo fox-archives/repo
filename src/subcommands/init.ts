@@ -158,7 +158,10 @@ func main() {
 	}
 
 	// Initialize Git
-	if (!util.pathExists(".git") && (await Confirm.prompt("Initialize Git?"))) {
+	if (
+		!(await util.pathExists(".git")) &&
+		(await Confirm.prompt("Initialize Git?"))
+	) {
 		await util.exec({
 			cmd: ["git", "init", "-b", "main"],
 		});
