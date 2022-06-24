@@ -16,11 +16,11 @@ export async function foxDocs() {
 		docsInputDir: "docs",
 		docsOutputDir: "site",
 		remoteName: "origin",
+		remoteBranchNameSource: "main",
 		remoteBranchName: "site",
 		options: {
 			mkdocs: {
 				// repo_name
-				// edit_uri
 				// nav
 				theme: {
 					name: "readthedocs",
@@ -42,6 +42,7 @@ export async function foxDocs() {
 		site_name: ctx.git.repo,
 		site_url: remoteUrls.site,
 		repo_url: remoteUrls.repo,
+		edit_uri: `edit/${settings.remoteBranchNameSource}/${settings.docsInputDir}/`,
 		// site_description: "", // TODO
 		site_author: ctx.person.fullname,
 		copyright: `© ${ctx.person.fullname}`,
