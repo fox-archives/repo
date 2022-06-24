@@ -120,13 +120,31 @@ export async function cdToProjectRoot() {
 export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 	// TODO: remove after all conversions
 	{
+		let cfg = {};
 		try {
 			let foxJson = await Deno.readTextFile("./fox.json");
 			if (foxJson.length === 0) {
 				foxJson = "{}";
 			}
+			cfg = JSON.parse(foxJson);
+			await Deno.remove("./fox.json");
+		} catch (unknownError: unknown) {
+			const err = util.assertInstanceOfError(unknownError);
+			if (!(err instanceof Deno.errors.NotFound)) {
+				throw err;
+			}
+		}
 
-			let cfg = JSON.parse(foxJson);
+		try {
+			await Deno.rename("./fox.toml", "./foxxy.toml");
+		} catch (unknownError: unknown) {
+			const err = util.assertInstanceOfError(unknownError);
+			if (!(err instanceof Deno.errors.NotFound)) {
+				throw err;
+			}
+		}
+
+		if (!(await util.pathExists("./foxxy.toml"))) {
 			const projectDir = Deno.cwd();
 			const projectEcosystem = await projectUtils.determineEcosystem(
 				projectDir
@@ -146,21 +164,6 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 				"./foxxy.toml",
 				toml.stringify(cfg).replaceAll('"', "'")
 			);
-			await Deno.remove("./fox.json");
-		} catch (unknownError: unknown) {
-			const err = util.assertInstanceOfError(unknownError);
-			if (!(err instanceof Deno.errors.NotFound)) {
-				throw err;
-			}
-		}
-
-		try {
-			await Deno.rename("./fox.toml", "./foxxy.toml");
-		} catch (unknownError: unknown) {
-			const err = util.assertInstanceOfError(unknownError);
-			if (!(err instanceof Deno.errors.NotFound)) {
-				throw err;
-			}
 		}
 	}
 

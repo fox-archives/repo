@@ -2,8 +2,8 @@ import { fs, toml, Ajv, path, z, flags, Confirm } from "../deps.ts";
 
 import * as types from "../types.ts";
 
-export function pathExists(filePath: string) {
-	return fs.exists(filePath);
+export async function pathExists(filePath: string) {
+	return await fs.exists(filePath);
 }
 
 export function die(msg: string): never {
