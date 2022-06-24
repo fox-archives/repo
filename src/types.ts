@@ -61,7 +61,7 @@ export type FoxConfigProject = {
 	ecosystem?: ProjectEcosystem;
 	form?: ProjectForm;
 	for?: "me" | "anyone";
-	status?: "experimental" | "should-work" | "maintained";
+	status?: "experimental" | "dogfooding" | "maintained";
 };
 export const FoxConfigProjectSchema = {
 	type: "object",
@@ -80,7 +80,7 @@ export const FoxConfigProjectSchema = {
 		},
 		status: {
 			type: "string",
-			enum: ["experimental", "should-work", "maintained"],
+			enum: ["experimental", "dogfooding", "maintained"],
 		},
 	},
 };
@@ -96,46 +96,6 @@ export type FoxConfigGlobal = {
 		vcsOwner: string;
 		vcsSite: string;
 	};
-};
-// TODO: remove duplication fox.schema.json
-export const FoxConfigGlobalSchema = {
-	type: "object",
-	additionalProperties: false,
-	required: ["person", "github_token", "defaults"],
-	properties: {
-		person: {
-			type: "object",
-			additionalProperties: false,
-			required: ["fullname", "email", "websiteURL"],
-			properties: {
-				fullname: {
-					type: "string",
-				},
-				email: {
-					type: "string",
-				},
-				websiteURL: {
-					type: "string",
-				},
-			},
-		},
-		github_token: {
-			type: "string",
-		},
-		defaults: {
-			type: "object",
-			additionalProperties: false,
-			required: ["vcsOwner", "vcsSite"],
-			properties: {
-				vcsOwner: {
-					type: "string",
-				},
-				vcsSite: {
-					type: "string",
-				},
-			},
-		},
-	},
 };
 
 /* ------------------ Fox Linter Module ----------------- */

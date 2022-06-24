@@ -208,10 +208,16 @@ export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 		util.die("Failed to find configuration file");
 	})();
 
-	return util.validateAjv<types.FoxConfigGlobal>(
-		types.FoxConfigGlobalSchema,
-		config
+	const foxConfigGlobalSchema = JSON.parse(
+		await Deno.readTextFile(
+			path.join(
+				path.dirname(path.fromFileUrl(import.meta.url)),
+				"../schemas/fox.schema.json"
+			)
+		)
 	);
+	delete foxConfigGlobalSchema.$schema; // TODO
+	return util.validateAjv<types.FoxConfigGlobal>(foxConfigGlobalSchema, config);
 }
 export async function incrementVersion(oldVersion: string): Promise<string> {
 	console.log(`Old version: ${oldVersion}`);
