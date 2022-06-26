@@ -83,7 +83,7 @@ export async function foxInit() {
 			await util.writeButDoNotOverride("package.json", "{}");
 			await util.writeButDoNotOverride(
 				"index.js",
-				`import * as ft from '@hyperupcall/foxtrot-nodejs'\n\nft.woof()\n`
+				`import * as foxtrot from '@hyperupcall/foxtrot-nodejs'\n\nfoxtrot.woof()\n`
 			);
 			await util.exec({
 				cmd: ["pnpm", "install", "@hyperupcall/foxtrot-nodejs"],
@@ -119,10 +119,10 @@ export async function foxInit() {
 				"main.go",
 				`package main
 
-import ft "github.com/hyperupcall/foxtrot-go"
+import foxtrot "github.com/hyperupcall/foxtrot-go"
 
 func main() {
-	ft.Woof()\n}\n`
+	foxtrot.Woof()\n}\n`
 			);
 			await util.exec({
 				cmd: ["go", "get", "github.com/hyperupcall/foxtrot-go"],
@@ -142,7 +142,7 @@ func main() {
 		for (const [taskName, taskContent] of Object.entries(bake)) {
 			bakefileShContents += `task.${taskName}() {\n\t`;
 			bakefileShContents += taskContent.split("\n").join("\t\n");
-			bakefileShContents += `\n}\n`;
+			bakefileShContents += `\n}\n\n`;
 		}
 		bakefileShContents += "\n";
 		return bakefileShContents;

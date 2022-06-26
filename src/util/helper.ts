@@ -168,8 +168,19 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 	}
 
 	const config = toml.parse(await Deno.readTextFile("./foxxy.toml"));
+
+	const foxConfigProjectSchema = JSON.parse(
+		await Deno.readTextFile(
+			path.join(
+				path.dirname(path.fromFileUrl(import.meta.url)),
+				"../schemas/foxxyProject.schema.json"
+			)
+		)
+	);
+	delete foxConfigProjectSchema.$schema; // TODO
+
 	return util.validateAjv<types.FoxConfigProject>(
-		types.FoxConfigProjectSchema,
+		foxConfigProjectSchema,
 		config
 	);
 }
@@ -212,7 +223,7 @@ export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 		await Deno.readTextFile(
 			path.join(
 				path.dirname(path.fromFileUrl(import.meta.url)),
-				"../schemas/fox.schema.json"
+				"../schemas/foxxyGlobal.schema.json"
 			)
 		)
 	);

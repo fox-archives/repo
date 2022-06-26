@@ -1,0 +1,64 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["project"],
+	"properties": {
+		"project": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"ecosystem": {
+					"type": "string",
+					"enum": [
+						"nodejs",
+						"golang",
+						"deno",
+						"rust",
+						"nim",
+						"basalt",
+						"gradle",
+						"unknown"
+					]
+				},
+				"form": {
+					"type": "string",
+					"enum": ["app", "lib", "unknown"]
+				}
+			}
+		},
+		"info": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"for": {
+					"type": "string",
+					"enum": ["me", "anyone"]
+				},
+				"status": {
+					"type": "string",
+					"enum": ["experimental", "dogfooding", "earlyaccess", "maintained"]
+				}
+			}
+		},
+		"discovery": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"categories": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"enum": ["hyperupcall"]
+					}
+				},
+				"tags": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	}
+}
