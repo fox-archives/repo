@@ -117,10 +117,16 @@ export async function cdToProjectRoot() {
 	util.die("Expected fox.json or git repository"); // FIXME
 }
 
+/**
+ * @description Detects and reads in any local Foxxy configuration. If the schema is out of
+ * date or the old JSON configuration file is found, convert it to the newer one
+ */
 export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
-	// TODO: remove after all conversions
 	{
 		let cfg = {};
+
+		// TODO: remove backwards compatibility once all files have been converted to new format/schema
+		// Read original fox.json if it exists
 		try {
 			let foxJson = await Deno.readTextFile("./fox.json");
 			if (foxJson.length === 0) {
@@ -135,6 +141,7 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 			}
 		}
 
+		// Rename to new config filename if it exists
 		try {
 			await Deno.rename("./fox.toml", "./foxxy.toml");
 		} catch (unknownError: unknown) {
@@ -144,26 +151,49 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 			}
 		}
 
+		const projectDir = Deno.cwd();
+		const projectEcosystem = await projectUtils.determineEcosystem(projectDir);
+		const projectForm = await projectUtils.determineForm(cfg, projectEcosystem);
+		const projectDefaults = {
+			ecosystem: projectEcosystem,
+			form: projectForm,
+			for: "me",
+			status: "experimental",
+		};
+
+		// If no existing Foxxy config file, create default
 		if (!(await util.pathExists("./foxxy.toml"))) {
-			const projectDir = Deno.cwd();
-			const projectEcosystem = await projectUtils.determineEcosystem(
-				projectDir
-			);
-			const projectForm = await projectUtils.determineForm(
-				cfg,
-				projectEcosystem
-			);
 			cfg = {
-				ecosystem: projectEcosystem,
-				form: projectForm,
-				for: "me",
-				status: "experimental",
-				...cfg,
+				project: {
+					...projectDefaults,
+					...cfg,
+				},
+				discovery: {
+					categories: [],
+					tags: [],
+				},
 			};
 			await Deno.writeTextFile(
 				"./foxxy.toml",
 				toml.stringify(cfg).replaceAll('"', "'")
 			);
+		}
+
+		// Update to Schema v2
+		{
+			const config = toml.parse(await Deno.readTextFile("./foxxy.toml"));
+			if (!config.project) {
+				await Deno.writeTextFile(
+					"./foxxy.toml",
+					toml.stringify({
+						project: projectDefaults,
+						discovery: {
+							categories: [],
+							tags: [],
+						},
+					})
+				);
+			}
 		}
 	}
 

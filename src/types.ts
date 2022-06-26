@@ -58,10 +58,16 @@ export const ProjectFormSchema = z.union([
 ]);
 
 export type FoxConfigProject = {
-	ecosystem?: ProjectEcosystem; // TODO: make types required
-	form?: ProjectForm;
-	for?: "me" | "anyone";
-	status?: "experimental" | "dogfooding" | "earlyaccess" | "maintained";
+	project?: {
+		ecosystem?: ProjectEcosystem;
+		form?: ProjectForm;
+		for?: "me" | "anyone";
+		status?: "experimental" | "dogfooding" | "earlyaccess" | "maintained";
+	};
+	discovery?: {
+		categories?: [];
+		tags?: [];
+	};
 };
 
 export type FoxConfigGlobal = {

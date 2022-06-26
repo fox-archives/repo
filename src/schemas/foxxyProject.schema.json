@@ -24,20 +24,16 @@
 				"form": {
 					"type": "string",
 					"enum": ["app", "lib", "unknown"]
-				}
-			}
-		},
-		"info": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"for": {
-					"type": "string",
-					"enum": ["me", "anyone"]
 				},
-				"status": {
-					"type": "string",
-					"enum": ["experimental", "dogfooding", "earlyaccess", "maintained"]
+				"properties": {
+					"for": {
+						"type": "string",
+						"enum": ["me", "anyone"]
+					},
+					"status": {
+						"type": "string",
+						"enum": ["experimental", "dogfooding", "earlyaccess", "maintained"]
+					}
 				}
 			}
 		},
