@@ -40,8 +40,8 @@ export async function determineForm(
 	foxConfig: types.FoxConfigProject,
 	ecosystemType: types.ProjectEcosystem
 ): Promise<types.ProjectForm> {
-	if (foxConfig.form) {
-		return foxConfig.form;
+	if (foxConfig?.project?.form) {
+		return foxConfig.project.form;
 	}
 
 	switch (ecosystemType) {

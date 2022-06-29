@@ -1,4 +1,9 @@
-ecosystem = 'deno'
-form = 'app'
-for = 'me'
-status = 'experimental'
+[project]
+ecosystem = "deno"
+form = "unknown"
+for = "me"
+status = "experimental"
+
+[discovery]
+categories = []
+tags = []

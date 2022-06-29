@@ -25,15 +25,13 @@
 					"type": "string",
 					"enum": ["app", "lib", "unknown"]
 				},
-				"properties": {
-					"for": {
-						"type": "string",
-						"enum": ["me", "anyone"]
-					},
-					"status": {
-						"type": "string",
-						"enum": ["experimental", "dogfooding", "earlyaccess", "maintained"]
-					}
+				"for": {
+					"type": "string",
+					"enum": ["me", "anyone"]
+				},
+				"status": {
+					"type": "string",
+					"enum": ["experimental", "dogfooding", "earlyaccess", "maintained"]
 				}
 			}
 		},
