@@ -7,8 +7,20 @@ export async function pathExists(filePath: string) {
 }
 
 export function die(msg: string): never {
-	logError(`${msg}. Exiting`);
+	logFatal(`${msg}. Exiting`);
 	Deno.exit(1);
+}
+
+export function dieWithHints(msg: string, hints: string[]): never {
+	logFatal(`${msg}`);
+	for (const hint of hints) {
+		console.error(`  - ${hint}`);
+	}
+	Deno.exit(1);
+}
+
+export function logFatal(msg: string) {
+	console.error(`Fatal: ${msg}`);
 }
 
 export function logError(msg: string) {

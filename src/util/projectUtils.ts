@@ -12,7 +12,7 @@ export async function determineEcosystem(
 		if (await util.pathExists("./package.json")) {
 			return "nodejs";
 		} else if (await util.pathExists("./go.mod")) {
-			return "go";
+			return "golang";
 		} else if (
 			(await util.pathExists("./deno.json")) ||
 			(await util.pathExists("./mod.ts"))

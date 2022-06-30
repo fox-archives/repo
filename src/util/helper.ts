@@ -107,14 +107,16 @@ export async function cdToProjectRoot() {
 		} while (dir !== "/");
 	};
 
-	for (const rel of ["fox.json", ".git"]) {
+	for (const rel of ["foxxy.toml", ".git"]) {
 		const dir = await cdUntilFileOrDir(Deno.cwd(), rel);
 		if (dir) {
 			return dir;
 		}
 	}
 
-	util.die("Expected fox.json or git repository"); // FIXME
+	util.dieWithHints("Failed to find project root", [
+		"Have you initialized the project with 'foxxy init'?",
+	]);
 }
 
 /**
@@ -175,7 +177,7 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 			};
 			await Deno.writeTextFile(
 				"./foxxy.toml",
-				toml.stringify(cfg).replaceAll('"', "'")
+				toml.stringify(cfg).replaceAll('"', "'").trim()
 			);
 		}
 

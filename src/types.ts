@@ -27,9 +27,7 @@ export type Context = {
 /* --------------- Fox Configuration File --------------- */
 
 export type ProjectEcosystem =
-	| "node"
 	| "nodejs"
-	| "go"
 	| "golang"
 	| "deno"
 	| "rust"
@@ -38,9 +36,7 @@ export type ProjectEcosystem =
 	| "gradle"
 	| "unknown";
 export const ProjectEcosystemSchema = z.union([
-	z.literal("node"),
 	z.literal("nodejs"),
-	z.literal("go"),
 	z.literal("golang"),
 	z.literal("deno"),
 	z.literal("rust"),

@@ -1,30 +1,325 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema",
-	"type": "object",
-	"additionalProperties": false,
-	"required": ["type", "name", "slug", "version", "authors", "description"],
-	"properties": {
-		"type": {
-			"type": "string",
-			"enum": ["app", "lib"]
-		},
-		"name": {
-			"type": "string"
-		},
-		"slug": {
-			"type": "string"
-		},
-		"version": {
-			"type": "string"
-		},
-		"authors": {
+	"definitions": {
+		"arrayOfStrings": {
 			"type": "array",
 			"items": {
 				"type": "string"
 			}
 		},
-		"description": {
-			"type": "string"
+		"onOff": {
+			"type": "string",
+			"enum": ["on", "off"]
+		}
+	},
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["package"],
+	"properties": {
+		"package": {
+			"type": "object",
+			"required": ["type", "name", "slug", "version", "authors", "description"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": ["app", "lib"]
+				},
+				"name": {
+					"type": "string"
+				},
+				"slug": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				},
+				"authors": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"description": {
+					"type": "string"
+				}
+			}
+		},
+		"run": {
+			"type": "object",
+			"properties": {
+				"dependencies": {
+					"$ref": "#/definitions/arrayOfStrings"
+				},
+				"sourceDirs": {
+					"$ref": "#/definitions/arrayOfStrings"
+				},
+				"builtinDirs": {
+					"$ref": "#/definitions/arrayOfStrings"
+				},
+				"binDirs": {
+					"$ref": "#/definitions/arrayOfStrings"
+				},
+				"completionDirs": {
+					"$ref": "#/definitions/arrayOfStrings"
+				},
+				"manDirs": {
+					"$ref": "#/definitions/arrayOfStrings"
+				},
+				"shellEnvironment": {
+					"type": "object"
+				},
+				"setOptions": {
+					"type": "object",
+					"additionalProperties": false,
+					"allexport": {
+						"$ref": "#/definitions/onOff"
+					},
+					"braceexpand": {
+						"$ref": "#/definitions/onOff"
+					},
+					"emacs": {
+						"$ref": "#/definitions/onOff"
+					},
+					"errexit": {
+						"$ref": "#/definitions/onOff"
+					},
+					"errtrace": {
+						"$ref": "#/definitions/onOff"
+					},
+					"functrace": {
+						"$ref": "#/definitions/onOff"
+					},
+					"hashall": {
+						"$ref": "#/definitions/onOff"
+					},
+					"histexpand": {
+						"$ref": "#/definitions/onOff"
+					},
+					"history": {
+						"$ref": "#/definitions/onOff"
+					},
+					"ignoreeof": {
+						"$ref": "#/definitions/onOff"
+					},
+					"interactive": {
+						"$ref": "#/definitions/onOff"
+					},
+					"commants": {
+						"$ref": "#/definitions/onOff"
+					},
+					"keyword": {
+						"$ref": "#/definitions/onOff"
+					},
+					"monitor": {
+						"$ref": "#/definitions/onOff"
+					},
+					"noclobber": {
+						"$ref": "#/definitions/onOff"
+					},
+					"noexec": {
+						"$ref": "#/definitions/onOff"
+					},
+					"noglob": {
+						"$ref": "#/definitions/onOff"
+					},
+					"nolog": {
+						"$ref": "#/definitions/onOff"
+					},
+					"notify": {
+						"$ref": "#/definitions/onOff"
+					},
+					"nounset": {
+						"$ref": "#/definitions/onOff"
+					},
+					"onecmd": {
+						"$ref": "#/definitions/onOff"
+					},
+					"physical": {
+						"$ref": "#/definitions/onOff"
+					},
+					"pipefail": {
+						"$ref": "#/definitions/onOff"
+					},
+					"posix": {
+						"$ref": "#/definitions/onOff"
+					},
+					"priviledged": {
+						"$ref": "#/definitions/onOff"
+					},
+					"verbose": {
+						"$ref": "#/definitions/onOff"
+					},
+					"vi": {
+						"$ref": "#/definitions/onOff"
+					},
+					"xtrace": {
+						"$ref": "#/definitions/onOff"
+					}
+				},
+				"shoptOptions": {
+					"type": "object",
+					"additionalProperties": false,
+					"autocd": {
+						"$ref": "#/definitions/onoff"
+					},
+					"assoc_expand_once": {
+						"$ref": "#/definitions/onoff"
+					},
+					"cdable_vars": {
+						"$ref": "#/definitions/onoff"
+					},
+					"cdspell": {
+						"$ref": "#/definitions/onoff"
+					},
+					"checkhash": {
+						"$ref": "#/definitions/onoff"
+					},
+					"checkjobs": {
+						"$ref": "#/definitions/onoff"
+					},
+					"checkwinsize": {
+						"$ref": "#/definitions/onoff"
+					},
+					"cmdhist": {
+						"$ref": "#/definitions/onoff"
+					},
+					"compat31": {
+						"$ref": "#/definitions/onoff"
+					},
+					"compat32": {
+						"$ref": "#/definitions/onoff"
+					},
+					"compat40": {
+						"$ref": "#/definitions/onoff"
+					},
+					"compat41": {
+						"$ref": "#/definitions/onoff"
+					},
+					"compat42": {
+						"$ref": "#/definitions/onoff"
+					},
+					"compat43": {
+						"$ref": "#/definitions/onoff"
+					},
+					"compat44": {
+						"$ref": "#/definitions/onoff"
+					},
+					"complete_fullquote": {
+						"$ref": "#/definitions/onoff"
+					},
+					"direxpand": {
+						"$ref": "#/definitions/onoff"
+					},
+					"dirspell": {
+						"$ref": "#/definitions/onoff"
+					},
+					"dotglob": {
+						"$ref": "#/definitions/onoff"
+					},
+					"execfail": {
+						"$ref": "#/definitions/onoff"
+					},
+					"expand_aliases": {
+						"$ref": "#/definitions/onoff"
+					},
+					"extdebug": {
+						"$ref": "#/definitions/onoff"
+					},
+					"extglob": {
+						"$ref": "#/definitions/onoff"
+					},
+					"extquote": {
+						"$ref": "#/definitions/onoff"
+					},
+					"failglob": {
+						"$ref": "#/definitions/onoff"
+					},
+					"force_fignore": {
+						"$ref": "#/definitions/onoff"
+					},
+					"globasciiranges": {
+						"$ref": "#/definitions/onoff"
+					},
+					"globstar": {
+						"$ref": "#/definitions/onoff"
+					},
+					"gnu_errfmt": {
+						"$ref": "#/definitions/onoff"
+					},
+					"histappend": {
+						"$ref": "#/definitions/onoff"
+					},
+					"histreedit": {
+						"$ref": "#/definitions/onoff"
+					},
+					"histverify": {
+						"$ref": "#/definitions/onoff"
+					},
+					"hostcomplete": {
+						"$ref": "#/definitions/onoff"
+					},
+					"huponexit": {
+						"$ref": "#/definitions/onoff"
+					},
+					"inherit_errexit": {
+						"$ref": "#/definitions/onoff"
+					},
+					"interactive_comments": {
+						"$ref": "#/definitions/onoff"
+					},
+					"lastpipe": {
+						"$ref": "#/definitions/onoff"
+					},
+					"lithist": {
+						"$ref": "#/definitions/onoff"
+					},
+					"localvar_inherit": {
+						"$ref": "#/definitions/onoff"
+					},
+					"localvar_unset": {
+						"$ref": "#/definitions/onoff"
+					},
+					"login_shell": {
+						"$ref": "#/definitions/onoff"
+					},
+					"mailwarn": {
+						"$ref": "#/definitions/onoff"
+					},
+					"no_empty_cmd_completion": {
+						"$ref": "#/definitions/onoff"
+					},
+					"nocaseglob": {
+						"$ref": "#/definitions/onoff"
+					},
+					"nocasematch": {
+						"$ref": "#/definitions/onoff"
+					},
+					"nullglob": {
+						"$ref": "#/definitions/onoff"
+					},
+					"progcomp": {
+						"$ref": "#/definitions/onoff"
+					},
+					"progcomp_alias": {
+						"$ref": "#/definitions/onoff"
+					},
+					"promptvars": {
+						"$ref": "#/definitions/onoff"
+					},
+					"restricted_shell": {
+						"$ref": "#/definitions/onoff"
+					},
+					"shift_verbose": {
+						"$ref": "#/definitions/onoff"
+					},
+					"sourcepath": {
+						"$ref": "#/definitions/onoff"
+					},
+					"xpg_echo": {
+						"$ref": "#/definitions/onoff"
+					}
+				}
+			}
 		}
 	}
 }
