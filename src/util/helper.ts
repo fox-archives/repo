@@ -187,13 +187,16 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 			if (!config.project) {
 				await Deno.writeTextFile(
 					"./foxxy.toml",
-					toml.stringify({
-						project: projectDefaults,
-						discovery: {
-							categories: [],
-							tags: [],
-						},
-					})
+					toml
+						.stringify({
+							project: projectDefaults,
+							discovery: {
+								categories: [],
+								tags: [],
+							},
+						})
+						.replaceAll('"', "'")
+						.trim()
 				);
 			}
 		}
