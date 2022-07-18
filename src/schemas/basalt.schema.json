@@ -18,8 +18,20 @@
 	"properties": {
 		"package": {
 			"type": "object",
-			"required": ["type", "name", "slug", "version", "authors", "description"],
+			"required": [
+				"lang",
+				"type",
+				"name",
+				"slug",
+				"version",
+				"authors",
+				"description"
+			],
 			"properties": {
+				"lang": {
+					"type": "string",
+					"enum": ["bash", "zsh", "ksh", "sh", "fish", "awk", "other"]
+				},
 				"type": {
 					"type": "string",
 					"enum": ["app", "lib"]
