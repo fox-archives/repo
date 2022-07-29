@@ -20,8 +20,6 @@ export const module: types.FoxModule = {
 			// if (content.trim().length == 0) {
 			// 	throw new Error(".editorconfig file cannot be empty"); // FIXME
 			// }
-
-			return [];
 		},
 	},
 };

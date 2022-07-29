@@ -4,6 +4,7 @@ import * as types from "../types.ts";
 import * as util from "./util.ts";
 import * as projectUtils from "./projectUtils.ts";
 import { foxLinterModules } from "../linters/index.ts";
+import { Notices } from "./Notices.ts";
 
 export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 	const moduleList = [];
@@ -17,18 +18,13 @@ export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 		}
 	}
 
-	let notices: types.Notice[] = [];
 	for (const module of moduleList) {
 		if (module.triggers?.onInitial) {
 			console.log(`Executing: ${module.name}::onInitial()`);
-			const ns = await module.triggers.onInitial(args);
-			if (ns) {
-				notices = notices.concat(
-					ns.map((item) => ({ ...item, moduleId: module.id }))
-				);
-			}
+			await module.triggers.onInitial(args);
 		}
 	}
+
 	// FIXME: use path.joinGlobs to autofilter
 	for await (const entry of fs.walk(ctx.dir, {
 		skip: [
@@ -41,31 +37,13 @@ export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 			for (const [glob, fn] of module.match) {
 				if (entry.path.match(path.globToRegExp(glob))) {
 					console.log(`Executing: ${module.name}::${glob}`);
-					const ns = await fn(args, entry);
-					if (ns) {
-						notices = notices.concat(
-							ns.map((item) => ({ ...item, moduleId: module.id }))
-						);
-					}
+					await fn(args, entry);
 				}
 			}
 		}
 	}
 
-	for (const notice of notices) {
-		if (!notice.file) {
-			console.log(`${c.underline(notice.name)}`);
-		}
-	}
-
-	for (const notice of notices) {
-		if (notice.file) {
-		}
-	}
-	if (notices.length > 0) {
-		console.log("NOTICES");
-		console.log(notices);
-	}
+	Notices.print();
 }
 
 export async function getContext(): Promise<types.Context> {

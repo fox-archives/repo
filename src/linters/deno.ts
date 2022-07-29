@@ -2,8 +2,10 @@ import { fs, asserts } from "../deps.ts";
 
 import * as types from "../types.ts";
 
+const LINTER_ID = "deno";
+
 export const module: types.FoxModule = {
-	id: "deno",
+	id: LINTER_ID,
 	name: "Deno",
 	activateOn: {
 		ecosystem: "deno",
@@ -23,8 +25,6 @@ export const module: types.FoxModule = {
 					},
 				};
 				asserts.assertEquals(expected, denoJson);
-
-				return [];
 			},
 		],
 	]),

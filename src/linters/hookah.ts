@@ -2,9 +2,12 @@ import { fs } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
+import { Notices } from "../util/Notices.ts";
+
+const LINTER_ID = "hookah";
 
 export const module: types.FoxModule = {
-	id: "hookah",
+	id: LINTER_ID,
 	name: "Hookah",
 	activateOn: {
 		ecosystem: "any",
@@ -12,14 +15,12 @@ export const module: types.FoxModule = {
 	},
 	triggers: {
 		async onInitial(opts: types.foxLintArgs) {
-			const notices: types.NoticeReturn[] = [];
+			const myNotices = new Notices(LINTER_ID);
 
-			if (!(await fs.exists(".hookah"))) {
-				notices.push({
-					name: "no-hookah",
+			if (!(await util.pathExists(".hookah"))) {
+				myNotices.add("no-hookah", {
 					description: "Hookah must be installed",
 				});
-				return notices;
 			}
 		},
 	},

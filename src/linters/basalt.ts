@@ -4,14 +4,15 @@ import * as lintUtils from "../util/lintUtils.ts";
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
 
+const LINTER_ID = "bake";
+
 export const module: types.FoxModule = {
-	id: "basalt",
+	id: LINTER_ID,
 	name: "Basalt",
 	activateOn: {
 		ecosystem: "any",
 		form: "any",
 	},
-	// @ts-ignore
 	match: new Map([
 		[
 			"basalt.toml",

@@ -97,24 +97,9 @@ export type FoxModule = {
 	};
 	match?: Map<
 		string,
-		(
-			opts: foxLintArgs,
-			entry: fs.WalkEntry
-		) => Promise<NoticeReturn[] | undefined>
+		(opts: foxLintArgs, entry: fs.WalkEntry) => Promise<void>
 	>;
 	triggers?: {
-		onInitial: (opts: foxLintArgs) => Promise<NoticeReturn[] | undefined>;
-	};
-};
-
-export type NoticeReturn = Omit<Notice, "moduleId">;
-export type Notice = {
-	moduleId: string;
-	name: string;
-	description: string;
-	file?: string;
-	position?: {
-		row?: number;
-		column?: number;
+		onInitial: (opts: foxLintArgs) => Promise<void>;
 	};
 };

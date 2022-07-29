@@ -2,6 +2,7 @@ import { fs, asserts } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
+import { Notices } from "../util/Notices.ts";
 
 import {
 	parseGitattributes,
@@ -9,8 +10,10 @@ import {
 	GitAttributeLine,
 } from "../parsers/gitattributes.ts";
 
+const LINTER_ID = "git";
+
 export const module: types.FoxModule = {
-	id: "git",
+	id: LINTER_ID,
 	name: "Git",
 	activateOn: {
 		ecosystem: "any",
@@ -18,16 +21,18 @@ export const module: types.FoxModule = {
 	},
 	triggers: {
 		async onInitial(opts: types.foxLintArgs) {
+			const myNotices = new Notices(LINTER_ID);
+
 			if (opts.fix) {
 				await fs.ensureFile(".gitattributes");
 			}
 
 			const text = await Deno.readTextFile(".gitattributes");
 			const parsed = parseGitattributes(text);
-			const notices: types.NoticeReturn[] = [];
+
 			const { foxxyAttributes, otherAttributes } = separateGitattributes(
 				parsed,
-				notices
+				myNotices
 			);
 
 			const finalFoxxyAttributes: GitAttributeLine[] = [
@@ -47,8 +52,7 @@ export const module: types.FoxModule = {
 			];
 
 			if (asserts.equal(foxxyAttributes, finalFoxxyAttributes)) {
-				notices.push({
-					name: "outdated-foxxy-attributes",
+				myNotices.add("outdated-foxxy-attributes", {
 					description: "The automatically generated attributes are out of date",
 				});
 			}
@@ -65,8 +69,7 @@ export const module: types.FoxModule = {
 				})();
 
 				if (present !== -1) {
-					notices.push({
-						name: "duplicated attributes",
+					myNotices.add("duplicated attributes", {
 						description:
 							"An automatically generated attribute duplicates with an already existing one",
 					});
@@ -87,8 +90,7 @@ export const module: types.FoxModule = {
 			for (const finalAttribute of finalAttributes) {
 				if (finalAttribute.pattern && finalAttribute.attributes) {
 					if (finalAttribute.pattern.includes("glue")) {
-						notices.push({
-							name: "has-old-glue",
+						myNotices.add("has-old-glue", {
 							description: "Should not have references to 'glue",
 						});
 					}
@@ -133,8 +135,6 @@ export const module: types.FoxModule = {
 			if (opts.fix) {
 				await Deno.writeTextFile(".gitattributes", finalText);
 			}
-
-			return notices;
 		},
 	},
 };

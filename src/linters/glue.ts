@@ -14,8 +14,6 @@ export const module: types.FoxModule = {
 		async onInitial(opts: types.foxLintArgs) {
 			await util.mustRemoveFile("glue.toml");
 			await util.mustRemoveDirectory(".glue");
-
-			return [];
 		},
 	},
 };

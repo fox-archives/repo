@@ -2,6 +2,7 @@ import { fs, asserts } from "../deps.ts";
 
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
+import type { Notices } from "../util/Notices.ts";
 
 export type GitAttributeLine = {
 	comment?: string;
@@ -51,7 +52,7 @@ export function parseGitattributes(text: string) {
 
 export function separateGitattributes(
 	lines: GitAttributeLine[],
-	problems: types.NoticeReturn[]
+	myNotices: InstanceType<typeof Notices>
 ) {
 	const foxxyAttributes: GitAttributeLine[] = [];
 	const otherAttributes: GitAttributeLine[] = [];
@@ -63,16 +64,14 @@ export function separateGitattributes(
 				if (line.comment === "# foxomate start") {
 					mode = "take-foxomate";
 				} else if (line.comment === "# foxomate end") {
-					problems.push({
-						name: "bad-block",
+					myNotices.add("bad-block", {
 						description:
 							"End declaration cannot come before starting declaration",
 					});
 				} else if (line.comment === "# foxxy start") {
 					mode = "take-foxomate";
 				} else if (line.comment === "# foxxy end") {
-					problems.push({
-						name: "bad-block",
+					myNotices.add("bad-block", {
 						description:
 							"End declaration cannot come before starting declaration",
 					});

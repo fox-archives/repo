@@ -3,8 +3,10 @@ import { fs, asserts } from "../deps.ts";
 import * as util from "../util/util.ts";
 import * as types from "../types.ts";
 
+const LINTER_ID = "bash";
+
 export const module: types.FoxModule = {
-	id: "bash",
+	id: LINTER_ID,
 	name: "Bash",
 	activateOn: {
 		ecosystem: "any",

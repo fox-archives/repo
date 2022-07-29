@@ -11,12 +11,11 @@ export const module: types.FoxModule = {
 		ecosystem: "any",
 		form: "any",
 	},
-	// TODO // FIXME
-	// @ts-ignore
+
 	match: new Map([
 		[
 			"package.json",
-			(opts: types.foxLintArgs, entry: fs.WalkEntry) => {
+			async (opts: types.foxLintArgs, entry: fs.WalkEntry) => {
 				// TODO: only support .prettierrc.json
 				// const packageJson = JSON.parse(entry.path);
 				// if (packageJson?.prettier) {
@@ -28,7 +27,7 @@ export const module: types.FoxModule = {
 		],
 		[
 			".prettierrc.json",
-			(opts: types.foxLintArgs, entry: fs.WalkEntry) => {
+			async (opts: types.foxLintArgs, entry: fs.WalkEntry) => {
 				const expected = getExpected();
 				const actualConfig = JSON.parse(entry.path);
 				lintUtils.validateValuesAgainst(expected, actualConfig);
@@ -36,10 +35,8 @@ export const module: types.FoxModule = {
 		],
 		[
 			"@(.prettierrc|.prettierrc.yml|.prettierrc.yaml|.prettierrc.json5|.prettierrc.js|.prettierrc.cjs|prettier.config.js|prettier.config.cjs|.prettierrc.toml)",
-			(opts: types.foxLintArgs, entry: fs.WalkEntry) => {
+			async (opts: types.foxLintArgs, entry: fs.WalkEntry) => {
 				console.log("not supported: " + entry.path); // TODO
-
-				return [];
 			},
 		],
 	]),

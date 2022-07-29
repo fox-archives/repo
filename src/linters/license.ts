@@ -26,8 +26,6 @@ export const module: types.FoxModule = {
 					throw err;
 				}
 			}
-
-			return [];
 		},
 	},
 };
