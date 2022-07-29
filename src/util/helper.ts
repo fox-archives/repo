@@ -183,8 +183,19 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 
 		// Update to Schema v2
 		{
-			const config = toml.parse(await Deno.readTextFile("./foxxy.toml"));
+			const config: {
+				ecosystem?: types.ProjectEcosystem;
+				form?: types.ProjectForm;
+				for?: types.ProjectFor;
+				status?: types.ProjectStatus;
+				project?: Record<string, unknown>;
+			} = toml.parse(await Deno.readTextFile("./foxxy.toml"));
 			if (!config.project) {
+				if (config.ecosystem) projectDefaults.ecosystem = config.ecosystem;
+				if (config.form) projectDefaults.form = config.form;
+				if (config.for) projectDefaults.for = config.for;
+				if (config.status) projectDefaults.status = config.status;
+
 				await Deno.writeTextFile(
 					"./foxxy.toml",
 					toml

@@ -53,12 +53,19 @@ export const ProjectFormSchema = z.union([
 	z.literal("unknown"),
 ]);
 
+export type ProjectFor = "me" | "anyone";
+export type ProjectStatus =
+	| "experimental"
+	| "dogfooding"
+	| "earlyaccess"
+	| "maintained";
+
 export type FoxConfigProject = {
 	project?: {
 		ecosystem?: ProjectEcosystem;
 		form?: ProjectForm;
-		for?: "me" | "anyone";
-		status?: "experimental" | "dogfooding" | "earlyaccess" | "maintained";
+		for?: ProjectFor;
+		status?: ProjectStatus;
 	};
 	discovery?: {
 		categories?: [];
