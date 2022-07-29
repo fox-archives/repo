@@ -7,7 +7,7 @@ import * as types from "../types.ts";
 
 type InitContext = types.Context & { git: NonNullable<types.Context["git"]> };
 
-export async function foxInit() {
+export async function foxxyInit() {
 	const foxxyConfigGlobal = await helper.getFoxConfigGlobal();
 
 	if (await util.pathExists("foxxy.toml")) {

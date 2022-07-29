@@ -5,7 +5,7 @@ import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 import * as projectUtils from "../util/projectUtils.ts";
 
-export async function foxLint(args: types.foxLintArgs) {
+export async function foxxyLint(args: types.foxLintArgs) {
 	const ctx = await helper.getContext();
 	const foxConfig = await helper.getFoxConfigLocal();
 

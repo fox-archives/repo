@@ -1,9 +1,9 @@
 import { Command } from "./deps.ts";
 
-import { foxInit } from "./subcommands/init.ts";
-import { foxLint } from "./subcommands/lint.ts";
-import { foxDocs } from "./subcommands/docs.ts";
-import { foxRelease } from "./subcommands/release.ts";
+import { foxxyInit } from "./subcommands/init.ts";
+import { foxxyLint } from "./subcommands/lint.ts";
+import { foxxyDocs } from "./subcommands/docs.ts";
+import { foxxyRelease } from "./subcommands/release.ts";
 
 await new Command()
 	.name("foxxy")
@@ -11,23 +11,23 @@ await new Command()
 	.version("v0.1.0")
 	.command("init", "Initializes")
 	.action(async () => {
-		await foxInit();
+		await foxxyInit();
 	})
 	.reset()
 	.command("lint", "Lints")
 	.option("--fix", "Fix mistakes")
 	.action(async (args) => {
-		await foxLint(args);
+		await foxxyLint(args);
 	})
 	.reset()
-	.command("docs", "Generate documentation")
+	.command("docs", "Generates documentation")
 	.action(async () => {
-		await foxDocs();
+		await foxxyDocs();
 	})
 	.reset()
 	.command("release", "Releases")
 	.action(async () => {
-		await foxRelease();
+		await foxxyRelease();
 	})
 	.reset()
 	.action(function () {

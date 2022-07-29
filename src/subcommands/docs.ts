@@ -5,7 +5,7 @@ import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 import * as projectUtils from "../util/projectUtils.ts";
 
-export async function foxDocs() {
+export async function foxxyDocs() {
 	const ctx = await helper.getContext();
 
 	if (!ctx.git) {
