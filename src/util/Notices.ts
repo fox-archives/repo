@@ -4,11 +4,13 @@ export type Notice = {
 	moduleId: string;
 	name: string;
 	description: string;
-	file?: string;
-	position?: {
-		row?: number;
-		column?: number;
+	context?: {
+		file?: string;
+		row?: string;
+		column?: string;
 	};
+
+	fixFunction?: () => void;
 };
 
 const noticesList: Notice[] = [];
@@ -20,15 +22,28 @@ export class Notices {
 		this.#moduleId = moduleId;
 	}
 
-	add(name: string, options: Omit<Notice, "moduleId" | "name">) {
+	add(
+		name: string,
+		options: Pick<Notice, "description" | "context">,
+		fixFunction?: () => void
+	) {
 		noticesList.push({
 			moduleId: this.#moduleId,
 			name,
 			...options,
+			fixFunction,
 		});
 	}
 
-	static print() {
+	static async fixAll() {
+		for (const notice of noticesList) {
+			if (notice.fixFunction) {
+				await notice.fixFunction();
+			}
+		}
+	}
+
+	static printAll() {
 		for (const notice of noticesList) {
 			console.log(`${c.red(`${notice.moduleId}/${notice.name}:`)}
   -> ${notice.description}`);

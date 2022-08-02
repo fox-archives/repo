@@ -250,6 +250,24 @@ export async function exec(
 	};
 }
 
+export async function getProjects(
+	rootDir: string,
+	options: {
+		ignored: string[];
+	} = { ignored: [] }
+) {
+	const paths = [];
+
+	for await (const dir of Deno.readDir(rootDir)) {
+		if (options.ignored.includes(dir.name)) continue;
+		if (!dir.isDirectory) continue;
+
+		paths.push(path.join(rootDir, dir.name));
+	}
+
+	return paths;
+}
+
 export function showHelp() {
 	console.log(`Name: foxxy
 

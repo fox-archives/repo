@@ -43,7 +43,7 @@ export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 		}
 	}
 
-	Notices.print();
+	Notices.printAll();
 }
 
 export async function getContext(): Promise<types.Context> {
