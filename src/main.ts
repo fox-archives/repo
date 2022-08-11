@@ -1,8 +1,9 @@
 import { Command } from "./deps.ts";
 
+import { foxxyClean } from "../subcommands/clean.ts";
+import { foxxyDocs } from "./subcommands/docs.ts";
 import { foxxyInit } from "./subcommands/init.ts";
 import { foxxyLint } from "./subcommands/lint.ts";
-import { foxxyDocs } from "./subcommands/docs.ts";
 import { foxxyOpen } from "./subcommands/open.ts";
 import { foxxyRelease } from "./subcommands/release.ts";
 
@@ -34,6 +35,11 @@ await new Command()
 	.command("open", "Open project")
 	.action(async () => {
 		await foxxyOpen();
+	})
+	.reset()
+	.command("clean", "Cleans projects")
+	.action(async () => {
+		await foxxyClean();
 	})
 	.reset()
 	.action(function () {
