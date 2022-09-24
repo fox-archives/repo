@@ -2,9 +2,9 @@
 
 A configuration file with your information is required
 
-Make sure to create a [GitHub PAT](https://github.com/settings/tokens/new?scopes=repo,workflow&description=Foxxy) as well
+Make sure to create a [GitHub PAT](https://github.com/settings/tokens/new?scopes=repo,workflow&description=Foxxo) as well
 
-At `~/.config/foxxy/config.json`:
+At `~/.config/foxxo/config.json`:
 
 ```sh
 {

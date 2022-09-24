@@ -5,7 +5,7 @@ import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 import * as projectUtils from "../util/projectUtils.ts";
 
-export async function foxxyDocs() {
+export async function foxxoDocs() {
 	const ctx = await helper.getContext();
 
 	if (!ctx.git) {
@@ -56,7 +56,7 @@ export async function foxxyDocs() {
 	// Push documentation branch to remote
 	{
 		const tmpDir = await Deno.makeTempDir({
-			prefix: "foxxy-",
+			prefix: "foxxo-",
 		});
 		try {
 			const mkdocsFile = path.join(tmpDir, "./mkdocs.yml");

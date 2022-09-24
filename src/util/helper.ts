@@ -49,14 +49,14 @@ export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 export async function getContext(): Promise<types.Context> {
 	await cdToProjectRoot();
 
-	const foxxyConfigGlobal = await getFoxConfigGlobal();
-	const foxxyConfigLocal = await getFoxConfigLocal();
+	const foxxoConfigGlobal = await getFoxConfigGlobal();
+	const foxxoConfigLocal = await getFoxConfigLocal();
 	const vcsInfo = await util.getVcsInfo();
 
 	const projectDir = Deno.cwd();
 	const projectEcosystem = await projectUtils.determineEcosystem(projectDir);
 	const projectForm = await projectUtils.determineForm(
-		foxxyConfigLocal,
+		foxxoConfigLocal,
 		projectEcosystem
 	);
 
@@ -65,8 +65,8 @@ export async function getContext(): Promise<types.Context> {
 		git: vcsInfo,
 		ecosystem: projectEcosystem,
 		form: projectForm,
-		person: foxxyConfigGlobal.person,
-		github_token: foxxyConfigGlobal.github_token,
+		person: foxxoConfigGlobal.person,
+		github_token: foxxoConfigGlobal.github_token,
 	};
 }
 
@@ -85,7 +85,7 @@ export async function cdToProjectRoot() {
 		} while (dir !== "/");
 	};
 
-	for (const rel of ["foxxy.toml", ".git"]) {
+	for (const rel of ["foxxo.toml", ".git"]) {
 		const dir = await cdUntilFileOrDir(Deno.cwd(), rel);
 		if (dir) {
 			return dir;
@@ -93,12 +93,12 @@ export async function cdToProjectRoot() {
 	}
 
 	util.dieWithHints("Failed to find project root", [
-		"Have you initialized the project with 'foxxy init'?",
+		"Have you initialized the project with 'foxxo init'?",
 	]);
 }
 
 /**
- * @description Detects and reads in any local Foxxy configuration. If the schema is out of
+ * @description Detects and reads in any local Foxxo configuration. If the schema is out of
  * date or the old JSON configuration file is found, convert it to the newer one
  */
 export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
@@ -123,7 +123,7 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 
 		// Rename to new config filename if it exists
 		try {
-			await Deno.rename("./fox.toml", "./foxxy.toml");
+			await Deno.rename("./fox.toml", "./foxxo.toml");
 		} catch (unknownError: unknown) {
 			const err = util.assertInstanceOfError(unknownError);
 			if (!(err instanceof Deno.errors.NotFound)) {
@@ -141,8 +141,8 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 			status: "experimental",
 		};
 
-		// If no existing Foxxy config file, create default
-		if (!(await util.pathExists("./foxxy.toml"))) {
+		// If no existing Foxxo config file, create default
+		if (!(await util.pathExists("./foxxo.toml"))) {
 			cfg = {
 				project: {
 					...projectDefaults,
@@ -154,7 +154,7 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 				},
 			};
 			await Deno.writeTextFile(
-				"./foxxy.toml",
+				"./foxxo.toml",
 				toml.stringify(cfg).replaceAll('"', "'").trim()
 			);
 		}
@@ -167,7 +167,7 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 				for?: types.ProjectFor;
 				status?: types.ProjectStatus;
 				project?: Record<string, unknown>;
-			} = toml.parse(await Deno.readTextFile("./foxxy.toml"));
+			} = toml.parse(await Deno.readTextFile("./foxxo.toml"));
 			if (!config.project) {
 				if (config.ecosystem) projectDefaults.ecosystem = config.ecosystem;
 				if (config.form) projectDefaults.form = config.form;
@@ -175,7 +175,7 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 				if (config.status) projectDefaults.status = config.status;
 
 				await Deno.writeTextFile(
-					"./foxxy.toml",
+					"./foxxo.toml",
 					toml
 						.stringify({
 							project: projectDefaults,
@@ -191,13 +191,13 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 		}
 	}
 
-	const config = toml.parse(await Deno.readTextFile("./foxxy.toml"));
+	const config = toml.parse(await Deno.readTextFile("./foxxo.toml"));
 
 	const foxConfigProjectSchema = JSON.parse(
 		await Deno.readTextFile(
 			path.join(
 				path.dirname(path.fromFileUrl(import.meta.url)),
-				"../schemas/foxxyProject.schema.json"
+				"../schemas/foxxoProject.schema.json"
 			)
 		)
 	);
@@ -214,7 +214,7 @@ export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 	const foxConfigDir = path.join(
 		Deno.env.get("XDG_CONFIG_HOME") ||
 			path.join(Deno.env.get("HOME") || "/WINDOWS_NOT_SUPPORTED", ".config"),
-		"foxxy"
+		"foxxo"
 	);
 
 	const config = await (async (): Promise<Record<string, unknown>> => {
@@ -247,7 +247,7 @@ export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 		await Deno.readTextFile(
 			path.join(
 				path.dirname(path.fromFileUrl(import.meta.url)),
-				"../schemas/foxxyGlobal.schema.json"
+				"../schemas/foxxoGlobal.schema.json"
 			)
 		)
 	);

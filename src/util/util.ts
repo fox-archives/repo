@@ -269,18 +269,18 @@ export async function getProjects(
 }
 
 export function showHelp() {
-	console.log(`Name: foxxy
+	console.log(`Name: foxxo
 
 Summary: Task automater and general linter
 
-Usage: foxxy [flags] [subcommand]
+Usage: foxxo [flags] [subcommand]
 
 Subcommands:
   init
     Initialize a new project
 
   lint [--fix]
-    Runs Foxxy linters for this project. By default, it will list all
+    Runs Foxxo linters for this project. By default, it will list all
     errors; optionally automatically fix the errors by passing '--fix'
 
   docs

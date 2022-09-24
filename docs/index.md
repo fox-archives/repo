@@ -1,4 +1,4 @@
-# Foxxy
+# Foxxo
 
 My task automator
 

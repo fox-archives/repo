@@ -5,7 +5,7 @@ import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 import NodeJSReleaser from "../releasers/nodejs.ts";
 
-export async function foxxyRelease() {
+export async function foxxoRelease() {
 	const ctx = await helper.getContext();
 
 	await NodeJSReleaser.release();

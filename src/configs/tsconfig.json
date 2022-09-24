@@ -1,0 +1,3 @@
+{
+	"extends": "@hyperupcall/tsconfig/ng-lib"
+}

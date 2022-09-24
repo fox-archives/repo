@@ -1,45 +1,45 @@
 import { Command } from "./deps.ts";
 
-import { foxxyClean } from "../subcommands/clean.ts";
-import { foxxyDocs } from "./subcommands/docs.ts";
-import { foxxyInit } from "./subcommands/init.ts";
-import { foxxyLint } from "./subcommands/lint.ts";
-import { foxxyOpen } from "./subcommands/open.ts";
-import { foxxyRelease } from "./subcommands/release.ts";
+import { foxxoClean } from "../subcommands/clean.ts";
+import { foxxoDocs } from "./subcommands/docs.ts";
+import { foxxoInit } from "./subcommands/init.ts";
+import { foxxoLint } from "./subcommands/lint.ts";
+import { foxxoOpen } from "./subcommands/open.ts";
+import { foxxoRelease } from "./subcommands/release.ts";
 
 await new Command()
-	.name("foxxy")
+	.name("foxxo")
 	.description("My task automator")
 	.version("v0.1.0")
 	.command("init", "Initializes")
 	.action(async () => {
-		await foxxyInit();
+		await foxxoInit();
 	})
 	.reset()
 	.command("lint", "Lints")
 	.option("--fix", "Fix mistakes")
 	.action(async (args) => {
-		await foxxyLint(args);
+		await foxxoLint(args);
 	})
 	.reset()
 	.command("docs", "Generates documentation")
 	.action(async () => {
-		await foxxyDocs();
+		await foxxoDocs();
 	})
 	.reset()
 	.command("release", "Releases")
 	.action(async () => {
-		await foxxyRelease();
+		await foxxoRelease();
 	})
 	.reset()
 	.command("open", "Open project")
 	.action(async () => {
-		await foxxyOpen();
+		await foxxoOpen();
 	})
 	.reset()
 	.command("clean", "Cleans projects")
 	.action(async () => {
-		await foxxyClean();
+		await foxxoClean();
 	})
 	.reset()
 	.action(function () {

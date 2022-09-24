@@ -4,7 +4,7 @@ import * as types from "../types.ts";
 import * as util from "../util/util.ts";
 import * as helper from "../util/helper.ts";
 
-export async function foxxyOpen() {
+export async function foxxoOpen() {
 	const home = Deno.env.get("HOME");
 	if (!home) {
 		throw new Error("home is not defined");

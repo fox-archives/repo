@@ -30,12 +30,12 @@ export const module: types.FoxModule = {
 			const text = await Deno.readTextFile(".gitattributes");
 			const parsed = parseGitattributes(text);
 
-			const { foxxyAttributes, otherAttributes } = separateGitattributes(
+			const { foxxoAttributes, otherAttributes } = separateGitattributes(
 				parsed,
 				myNotices
 			);
 
-			const finalFoxxyAttributes: GitAttributeLine[] = [
+			const finalFoxxoAttributes: GitAttributeLine[] = [
 				{
 					pattern: "*",
 					attributes: {
@@ -51,17 +51,17 @@ export const module: types.FoxModule = {
 				},
 			];
 
-			if (asserts.equal(foxxyAttributes, finalFoxxyAttributes)) {
-				myNotices.add("outdated-foxxy-attributes", {
+			if (asserts.equal(foxxoAttributes, finalFoxxoAttributes)) {
+				myNotices.add("outdated-foxxo-attributes", {
 					description: "The automatically generated attributes are out of date",
 				});
 			}
 
-			for (const finalFoxxyAttribute of finalFoxxyAttributes) {
+			for (const finalFoxxoAttribute of finalFoxxoAttributes) {
 				const present = ((): number => {
 					for (let i = 0; i < otherAttributes.length; ++i) {
 						const item = otherAttributes[i];
-						if (asserts.equal(item, finalFoxxyAttribute)) {
+						if (asserts.equal(item, finalFoxxoAttribute)) {
 							return i;
 						}
 					}
@@ -78,9 +78,9 @@ export const module: types.FoxModule = {
 			}
 
 			const finalAttributes: GitAttributeLine[] = [
-				{ comment: "# foxxy start" },
-				...finalFoxxyAttributes,
-				{ comment: "# foxxy end" },
+				{ comment: "# foxxo start" },
+				...finalFoxxoAttributes,
+				{ comment: "# foxxo end" },
 				{
 					newline: true,
 				},

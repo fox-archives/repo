@@ -54,7 +54,7 @@ export function separateGitattributes(
 	lines: GitAttributeLine[],
 	myNotices: InstanceType<typeof Notices>
 ) {
-	const foxxyAttributes: GitAttributeLine[] = [];
+	const foxxoAttributes: GitAttributeLine[] = [];
 	const otherAttributes: GitAttributeLine[] = [];
 
 	let mode: "default" | "take-foxomate" = "default";
@@ -68,9 +68,9 @@ export function separateGitattributes(
 						description:
 							"End declaration cannot come before starting declaration",
 					});
-				} else if (line.comment === "# foxxy start") {
+				} else if (line.comment === "# foxxo start") {
 					mode = "take-foxomate";
-				} else if (line.comment === "# foxxy end") {
+				} else if (line.comment === "# foxxo end") {
 					myNotices.add("bad-block", {
 						description:
 							"End declaration cannot come before starting declaration",
@@ -81,30 +81,30 @@ export function separateGitattributes(
 			} else if (mode === "take-foxomate") {
 				if (line.comment === "# foxomate end") {
 					mode = "default";
-				} else if (line.comment === "# foxxy end") {
+				} else if (line.comment === "# foxxo end") {
 					mode = "default";
 				} else {
-					foxxyAttributes.push(line);
+					foxxoAttributes.push(line);
 				}
 			}
 		} else if (line.pattern && line.attributes) {
 			if (mode === "default") {
 				otherAttributes.push(line);
 			} else if (mode === "take-foxomate") {
-				foxxyAttributes.push(line);
+				foxxoAttributes.push(line);
 			}
 		} else if (line.newline) {
 			if (mode === "default") {
 				otherAttributes.push(line);
 			} else if (mode === "take-foxomate") {
-				foxxyAttributes.push(line);
+				foxxoAttributes.push(line);
 			}
 		} else {
 			throw new Error("An attribute unaccounted for was detected");
 		}
 	}
 
-	return { foxxyAttributes, otherAttributes };
+	return { foxxoAttributes, otherAttributes };
 }
 
 function hasFoxomateDeclaration(line: string, value = "") {

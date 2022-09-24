@@ -10,7 +10,7 @@ I first approached this problem by developing [Glue](https://github.com/hyperupc
 
 I thought this would make things more simple, but increased complexity since supposed-general-enough "tasks" would often need to be overridden on a per-repository Basis.
 
-With Foxxy, it interoperates with any task runner, such as with [Bake](https://github.com/hyperupcall/bake), my home-grown one
+With Foxxo, it interoperates with any task runner, such as with [Bake](https://github.com/hyperupcall/bake), my home-grown one
 
 2. Authoring the software in Bash
 

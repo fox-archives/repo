@@ -1,0 +1,6 @@
+{
+	"extends": [
+		"@hyperupcall/stylelint-config",
+		"@hyperupcall/stylelint-config/modules"
+	]
+}

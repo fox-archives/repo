@@ -7,10 +7,10 @@ import * as types from "../types.ts";
 
 type InitContext = types.Context & { git: NonNullable<types.Context["git"]> };
 
-export async function foxxyInit() {
-	const foxxyConfigGlobal = await helper.getFoxConfigGlobal();
+export async function foxxoInit() {
+	const foxxoConfigGlobal = await helper.getFoxConfigGlobal();
 
-	if (await util.pathExists("foxxy.toml")) {
+	if (await util.pathExists("foxxo.toml")) {
 		console.log(
 			"A project has already been initialized here. No action needed"
 		);
@@ -21,7 +21,7 @@ export async function foxxyInit() {
 		run: ":",
 	};
 
-	const ctx = await getInitContext(foxxyConfigGlobal);
+	const ctx = await getInitContext(foxxoConfigGlobal);
 	switch (ctx.ecosystem) {
 		case "nodejs":
 			await initNodejs(ctx);
@@ -170,7 +170,7 @@ async function initGithub(ctx: InitContext) {
 }
 
 async function getInitContext(
-	foxxyConfigGlobal: types.FoxConfigGlobal
+	foxxoConfigGlobal: types.FoxConfigGlobal
 ): Promise<InitContext> {
 	const isDirEmpty = async (dir: string): Promise<boolean> => {
 		return (await util.arrayFromAsync(Deno.readDir(dir))).length === 0;
@@ -200,9 +200,9 @@ async function getInitContext(
 			util.die("Repository name cannot be empty");
 		}
 	} else {
-		let foxxyConfig: types.FoxConfigProject = {};
+		let foxxoConfig: types.FoxConfigProject = {};
 		try {
-			foxxyConfig = await helper.getFoxConfigLocal();
+			foxxoConfig = await helper.getFoxConfigLocal();
 		} catch (unknownError: unknown) {
 			const err = util.assertInstanceOfError(unknownError);
 			if (!(err instanceof Deno.errors.NotFound)) {
@@ -212,7 +212,7 @@ async function getInitContext(
 
 		projectEcosystem = await projectUtils.determineEcosystem(projectDir);
 		projectForm = await projectUtils.determineForm(
-			foxxyConfig,
+			foxxoConfig,
 			projectEcosystem
 		);
 	}
@@ -220,12 +220,12 @@ async function getInitContext(
 	return {
 		dir: projectDir,
 		git: {
-			site: foxxyConfigGlobal.defaults.vcsSite,
-			owner: foxxyConfigGlobal.defaults.vcsOwner,
+			site: foxxoConfigGlobal.defaults.vcsSite,
+			owner: foxxoConfigGlobal.defaults.vcsOwner,
 			repo: projectRepo,
 		},
 		ecosystem: projectEcosystem,
 		form: projectForm,
-		...foxxyConfigGlobal,
+		...foxxoConfigGlobal,
 	};
 }
