@@ -61,16 +61,17 @@ export function separateGitattributes(
 	for (const line of lines) {
 		if (line.comment) {
 			if (mode === "default") {
-				if (line.comment === "# foxomate start") {
+				if (
+					line.comment === "# foxomate start" ||
+					line.comment === "# foxxy start" ||
+					line.comment === "# foxxo start"
+				) {
 					mode = "take-foxomate";
-				} else if (line.comment === "# foxomate end") {
-					myNotices.add("bad-block", {
-						description:
-							"End declaration cannot come before starting declaration",
-					});
-				} else if (line.comment === "# foxxo start") {
-					mode = "take-foxomate";
-				} else if (line.comment === "# foxxo end") {
+				} else if (
+					line.comment === "# foxomate end" ||
+					line.comment === "# foxxy end" ||
+					line.comment === "# foxxo end"
+				) {
 					myNotices.add("bad-block", {
 						description:
 							"End declaration cannot come before starting declaration",
@@ -79,9 +80,11 @@ export function separateGitattributes(
 					otherAttributes.push(line);
 				}
 			} else if (mode === "take-foxomate") {
-				if (line.comment === "# foxomate end") {
-					mode = "default";
-				} else if (line.comment === "# foxxo end") {
+				if (
+					line.comment === "# foxomate end" ||
+					line.comment === "# foxxy end" ||
+					line.comment === "# foxxo end"
+				) {
 					mode = "default";
 				} else {
 					foxxoAttributes.push(line);
@@ -108,5 +111,5 @@ export function separateGitattributes(
 }
 
 function hasFoxomateDeclaration(line: string, value = "") {
-	return line.match(new RegExp(`^(?:#|//)[ \t]*foxomate[ \t]*${value}`));
+	return line.match(new RegExp(`^(?:#|//)[ \t]*foxxo[ \t]*${value}`));
 }

@@ -1,6 +1,6 @@
 import { Command } from "./deps.ts";
 
-import { foxxoClean } from "../subcommands/clean.ts";
+import { foxxoClean } from "./subcommands/clean.ts";
 import { foxxoDocs } from "./subcommands/docs.ts";
 import { foxxoInit } from "./subcommands/init.ts";
 import { foxxoLint } from "./subcommands/lint.ts";

@@ -85,7 +85,7 @@ export async function cdToProjectRoot() {
 		} while (dir !== "/");
 	};
 
-	for (const rel of ["foxxo.toml", ".git"]) {
+	for (const rel of ["foxxy.toml", "foxxo.toml", ".git"]) {
 		const dir = await cdUntilFileOrDir(Deno.cwd(), rel);
 		if (dir) {
 			return dir;
@@ -123,7 +123,15 @@ export async function getFoxConfigLocal(): Promise<types.FoxConfigProject> {
 
 		// Rename to new config filename if it exists
 		try {
-			await Deno.rename("./fox.toml", "./foxxo.toml");
+			await Deno.rename("./fox.toml", "./foxxy.toml");
+		} catch (unknownError: unknown) {
+			const err = util.assertInstanceOfError(unknownError);
+			if (!(err instanceof Deno.errors.NotFound)) {
+				throw err;
+			}
+		}
+		try {
+			await Deno.rename("./foxxy.toml", "./foxxo.toml");
 		} catch (unknownError: unknown) {
 			const err = util.assertInstanceOfError(unknownError);
 			if (!(err instanceof Deno.errors.NotFound)) {
@@ -240,7 +248,7 @@ export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 			}
 		}
 
-		util.die("Failed to find configuration file");
+		util.die("Failed to find global configuration file");
 	})();
 
 	const foxConfigGlobalSchema = JSON.parse(
