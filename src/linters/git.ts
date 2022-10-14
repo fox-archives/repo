@@ -115,21 +115,21 @@ export const module: types.FoxModule = {
 				if (finalAttribute.newline) {
 					finalText += "\n";
 				} else if (finalAttribute.comment) {
-					finalText += finalAttribute.comment + "\n";
+					finalText += finalAttribute.comment.trimEnd() + "\n";
 				} else if (finalAttribute.pattern && finalAttribute.attributes) {
-					finalText += finalAttribute.pattern + " ";
+					let line = finalAttribute.pattern + " ";
 					for (const [attrKey, attrValue] of Object.entries(
 						finalAttribute.attributes
 					)) {
 						if (attrValue === true) {
-							finalText += attrKey + " ";
+							line += attrKey + " ";
 						} else if (attrValue === false) {
-							finalText += "-" + attrKey + " ";
+							line += "-" + attrKey + " ";
 						} else {
-							finalText += attrKey + "=" + attrValue + " ";
+							line += attrKey + "=" + attrValue + " ";
 						}
 					}
-					finalText += "\n";
+					finalText += line.trimEnd() + "\n";
 				}
 			}
 			if (opts.fix) {
