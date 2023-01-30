@@ -9,6 +9,7 @@ type InitContext = types.Context & { git: NonNullable<types.Context["git"]> };
 
 export async function foxxoInit() {
 	const foxxoConfigGlobal = await helper.getFoxConfigGlobal();
+	const foxxoStateGlobal = await helper.getFoxStateGlobal();
 
 	if (await util.pathExists("foxxo.toml")) {
 		console.log(
@@ -21,7 +22,7 @@ export async function foxxoInit() {
 		run: ":",
 	};
 
-	const ctx = await getInitContext(foxxoConfigGlobal);
+	const ctx = await getInitContext(foxxoConfigGlobal, foxxoStateGlobal);
 	switch (ctx.ecosystem) {
 		case "nodejs":
 			await initNodejs(ctx);
@@ -170,7 +171,8 @@ async function initGithub(ctx: InitContext) {
 }
 
 async function getInitContext(
-	foxxoConfigGlobal: types.FoxConfigGlobal
+	foxxoConfigGlobal: types.FoxConfigGlobal,
+	foxxoStateGlobal: types.FoxStateGlobal
 ): Promise<InitContext> {
 	const isDirEmpty = async (dir: string): Promise<boolean> => {
 		return (await util.arrayFromAsync(Deno.readDir(dir))).length === 0;
@@ -224,6 +226,7 @@ async function getInitContext(
 			owner: foxxoConfigGlobal.defaults.vcsOwner,
 			repo: projectRepo,
 		},
+		github_token: foxxoStateGlobal.github_token,
 		ecosystem: projectEcosystem,
 		form: projectForm,
 		...foxxoConfigGlobal,

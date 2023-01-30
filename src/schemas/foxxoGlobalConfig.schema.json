@@ -2,7 +2,7 @@
 	"$schema": "http://json-schema.org/draft-04/schema",
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["person", "github_token", "defaults"],
+	"required": ["person", "defaults"],
 	"properties": {
 		"person": {
 			"type": "object",
@@ -10,18 +10,18 @@
 			"required": ["fullname", "email", "websiteURL"],
 			"properties": {
 				"fullname": {
-					"type": "string"
+					"type": "string",
+					"minLength": 1
 				},
 				"email": {
-					"type": "string"
+					"type": "string",
+					"minLength": 1
 				},
 				"websiteURL": {
-					"type": "string"
+					"type": "string",
+					"minLength": 1
 				}
 			}
-		},
-		"github_token": {
-			"type": "string"
 		},
 		"defaults": {
 			"type": "object",

@@ -49,6 +49,7 @@ export async function performLint(ctx: types.Context, args: types.foxLintArgs) {
 export async function getContext(): Promise<types.Context> {
 	await cdToProjectRoot();
 
+	const foxxoStateGlobal = await getFoxStateGlobal();
 	const foxxoConfigGlobal = await getFoxConfigGlobal();
 	const foxxoConfigLocal = await getFoxConfigLocal();
 	const vcsInfo = await util.getVcsInfo();
@@ -66,7 +67,7 @@ export async function getContext(): Promise<types.Context> {
 		ecosystem: projectEcosystem,
 		form: projectForm,
 		person: foxxoConfigGlobal.person,
-		github_token: foxxoConfigGlobal.github_token,
+		github_token: foxxoStateGlobal.github_token,
 	};
 }
 
@@ -255,13 +256,51 @@ export async function getFoxConfigGlobal(): Promise<types.FoxConfigGlobal> {
 		await Deno.readTextFile(
 			path.join(
 				path.dirname(path.fromFileUrl(import.meta.url)),
-				"../schemas/foxxoGlobal.schema.json"
+				"../schemas/foxxoGlobalConfig.schema.json"
 			)
 		)
 	);
 	delete foxConfigGlobalSchema.$schema; // TODO
 	return util.validateAjv<types.FoxConfigGlobal>(foxConfigGlobalSchema, config);
 }
+
+export async function getFoxStateGlobal(): Promise<types.FoxStateGlobal> {
+	// TODO: library xdg library
+	const foxConfigDir = path.join(
+		Deno.env.get("XDG_STATE_HOME") ||
+			path.join(
+				Deno.env.get("HOME") || "/WINDOWS_NOT_SUPPORTED",
+				".local/state"
+			),
+		"foxxo"
+	);
+
+	const config = await (async () => {
+		try {
+			return JSON.parse(
+				await Deno.readTextFile(path.join(foxConfigDir, "./state.json"))
+			);
+		} catch (unknownError: unknown) {
+			const err = util.assertInstanceOfError(unknownError);
+			if (!(err instanceof Deno.errors.NotFound)) {
+				throw err;
+			}
+		}
+	})();
+
+	const foxStateGlobalSchema = JSON.parse(
+		await Deno.readTextFile(
+			path.join(
+				path.dirname(path.fromFileUrl(import.meta.url)),
+				"../schemas/foxxoGlobalState.schema.json"
+			)
+		)
+	);
+	delete foxStateGlobalSchema.$schema; // TODO
+
+	return util.validateAjv<types.FoxStateGlobal>(foxStateGlobalSchema, config);
+}
+
 export async function incrementVersion(oldVersion: string): Promise<string> {
 	console.log(`Old version: ${oldVersion}`);
 	const newVersion = await prompt("New version?");

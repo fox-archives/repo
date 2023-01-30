@@ -13,9 +13,17 @@ At `~/.config/foxxo/config.json`:
 		"email": "edwin@kofler.dev",
 		"websiteURL": "edwinkofler.com"
 	},
-	"github_token": "",
 	"defaults": {
-		"vcsOwner": "hyperupcall"
+		"vcsOwner": "hyperupcall",
+		"vcsSite": "github.com"
 	}
+}
+```
+
+At `~/.local/state/foxxo/state.json`:
+
+```sh
+{
+    "github_token": ""
 }
 ```

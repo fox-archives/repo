@@ -21,7 +21,7 @@ export type Context = {
 	ecosystem: ProjectEcosystem;
 	form: ProjectForm;
 	person: FoxConfigGlobal["person"];
-	github_token: FoxConfigGlobal["github_token"];
+	github_token: FoxStateGlobal["github_token"];
 };
 
 /* --------------- Fox Configuration File --------------- */
@@ -79,11 +79,14 @@ export type FoxConfigGlobal = {
 		email: string;
 		websiteURL: string;
 	};
-	github_token: string;
 	defaults: {
 		vcsOwner: string;
 		vcsSite: string;
 	};
+};
+
+export type FoxStateGlobal = {
+	github_token: string;
 };
 
 /* ------------------ Fox Linter Module ----------------- */
