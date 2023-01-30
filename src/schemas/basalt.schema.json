@@ -187,163 +187,163 @@
 					"additionalProperties": false,
 					"properties": {
 						"autocd": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"assoc_expand_once": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"cdable_vars": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"cdspell": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"checkhash": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"checkjobs": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"checkwinsize": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"cmdhist": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"compat31": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"compat32": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"compat40": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"compat41": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"compat42": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"compat43": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"compat44": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"complete_fullquote": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"direxpand": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"dirspell": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"dotglob": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"execfail": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"expand_aliases": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"extdebug": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"extglob": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"extquote": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"failglob": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"force_fignore": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"globasciiranges": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"globstar": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"gnu_errfmt": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"histappend": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"histreedit": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"histverify": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"hostcomplete": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"huponexit": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"inherit_errexit": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"interactive_comments": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"lastpipe": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"lithist": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"localvar_inherit": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"localvar_unset": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"login_shell": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"mailwarn": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"no_empty_cmd_completion": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"nocaseglob": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"nocasematch": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"nullglob": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"progcomp": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"progcomp_alias": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"promptvars": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"restricted_shell": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"shift_verbose": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"sourcepath": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						},
 						"xpg_echo": {
-							"$ref": "#/definitions/onoff"
+							"$ref": "#/definitions/onOff"
 						}
 					}
 				}
