@@ -2,5 +2,6 @@
 	"deno.enable": true,
 	"deno.lint": true,
 	"deno.unstable": false,
-	"deno.suggest.completeFunctionCalls": true
+	"deno.suggest.completeFunctionCalls": true,
+	"rust-analyzer.linkedProjects": ["./Cargo.toml"]
 }

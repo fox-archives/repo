@@ -4,10 +4,11 @@ use config::parse_local_config;
 mod cli;
 mod commands;
 mod config;
+mod repo;
 mod util;
 
 use cli::{Cli, Cmd, DeployCmd, InternalCmd, TemplateCmd};
-use commands::{RunDeploy, RunInternal, RunTask, RunTemplate};
+use commands::{RunDeploy, RunGui, RunInternal, RunTask, RunTemplate};
 use util::get_template_info;
 
 fn main() {
@@ -67,6 +68,11 @@ fn main() {
 					run_deploy.list().unwrap();
 				}
 			}
+		}
+		Cmd::Gui {} => {
+			let run_gui = RunGui::new();
+
+			run_gui.run();
 		}
 		Cmd::Internal { cmd } => {
 			let run_internal = RunInternal::new();

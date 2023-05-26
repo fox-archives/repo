@@ -25,6 +25,7 @@ pub enum Cmd {
 		#[command(subcommand)]
 		cmd: DeployCmd,
 	},
+	Gui {},
 	Internal {
 		#[command(subcommand)]
 		cmd: InternalCmd,
