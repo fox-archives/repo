@@ -1,15 +1,12 @@
-use std::process::exit;
-
 use clap::{CommandFactory, Parser};
 use config::parse_local_config;
-use directories::BaseDirs;
 
 mod cli;
 mod commands;
 mod config;
 mod util;
 
-use cli::{Cli, Cmd, InternalCmd, TemplateCmd};
+use cli::{Cli, Cmd, DeployCmd, InternalCmd, TemplateCmd};
 use commands::{RunDeploy, RunInternal, RunTask, RunTemplate};
 use util::get_template_info;
 
@@ -27,13 +24,13 @@ fn main() {
 				} => {
 					let template = get_template_info(template_name.clone(), target_dirname.clone());
 
-					run_template.command_use(template, *watch);
+					run_template.command_use(template, *watch).unwrap();
 				}
 				TemplateCmd::New { template_name } => {
-					run_template.command_new(template_name.clone());
+					run_template.command_new(template_name.clone()).unwrap();
 				}
 				TemplateCmd::List {} => {
-					run_template.list();
+					run_template.list().unwrap();
 				}
 			};
 		}
@@ -49,20 +46,40 @@ fn main() {
 		Cmd::Deploy { cmd } => {
 			let run_deploy = RunDeploy::new();
 
-			run_deploy.d(&mut Cli::command());
+			match cmd {
+				DeployCmd::Now {} => {
+					// Move NOW stuff to 'add' and make its behavior
+					// when not specifying directly
+					run_deploy.d(&mut Cli::command()).unwrap();
+				}
+				DeployCmd::Add {} => {
+					// ADD directories corresponding to a binary (and label them). Somehow also incorporate PATH
+					run_deploy.add()
+				}
+				DeployCmd::Set {} => {
+					// Set which of the entries to use
+					run_deploy.set()
+				}
+				DeployCmd::Info { bin } => {
+					run_deploy.info(bin.clone()).unwrap();
+				}
+				DeployCmd::List {} => {
+					run_deploy.list().unwrap();
+				}
+			}
 		}
 		Cmd::Internal { cmd } => {
 			let run_internal = RunInternal::new();
 
 			match cmd {
 				InternalCmd::Doctor {} => {
-					parse_local_config();
+					parse_local_config().unwrap();
 				}
 				InternalCmd::Completion { shell } => {
 					run_internal.run(shell.clone(), &mut Cli::command());
 				}
 				InternalCmd::GenerateReadme {} => {
-					run_internal.generate_readme();
+					run_internal.generate_readme().unwrap();
 				}
 			};
 		}

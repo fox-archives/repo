@@ -1,9 +1,6 @@
-use std::{
-	fs::{self, File},
-	io::{BufRead, BufReader},
-	process::exit,
-};
+use std::{fs::File, io::BufReader};
 
+use anyhow::Result;
 use directories::BaseDirs;
 use serde::{Deserialize, Serialize};
 
@@ -52,17 +49,16 @@ struct Defaults {
 	vcs_site: String,
 }
 
-pub fn parse_local_config() {
-	let Some(base_dirs) = BaseDirs::new() else {
-		eprintln!("Failed to get base_dirs");
-		exit(1);
-	};
+pub fn parse_local_config() -> Result<()> {
+	let base_dirs = BaseDirs::new().expect("Failed to create BaseDirs");
 
 	let config_file = base_dirs.config_dir().join("foxxo/config.json");
 
-	let file = File::open(config_file).unwrap();
+	let file = File::open(config_file)?;
 	let rdr = BufReader::new(file);
-	let config: Config = serde_json::from_reader(rdr).unwrap();
+	let config: Config = serde_json::from_reader(rdr)?;
 
 	println!("{:?}", config);
+
+	Ok(())
 }

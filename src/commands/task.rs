@@ -1,8 +1,9 @@
 use std::{
-	fs,
 	path::Path,
 	process::{exit, Command},
 };
+
+use anyhow::Result;
 
 pub struct RunTask;
 
@@ -36,7 +37,8 @@ impl RunTask {
 						run: format!("{pkg_mgr} run").to_string(),
 						test: format!("{pkg_mgr} run test").to_string(),
 					},
-				);
+				)
+				.unwrap();
 			}
 			"go" => exec(
 				task_name,
@@ -45,7 +47,8 @@ impl RunTask {
 					run: "go run".to_string(),
 					test: "go test".to_string(),
 				},
-			),
+			)
+			.unwrap(),
 			_ => {
 				println!("Ecosystem not found");
 			}
@@ -59,7 +62,7 @@ struct TaskMap {
 	test: String,
 }
 
-fn exec(task_name: String, task_map: TaskMap) {
+fn exec(task_name: String, task_map: TaskMap) -> Result<()> {
 	let run_command = match task_name.as_str() {
 		"build" => task_map.build,
 		"run" => task_map.run,
@@ -73,8 +76,8 @@ fn exec(task_name: String, task_map: TaskMap) {
 	Command::new("bash")
 		.arg("-c")
 		.arg(run_command)
-		.spawn()
-		.unwrap()
-		.wait()
-		.unwrap();
+		.spawn()?
+		.wait()?;
+
+	Ok(())
 }

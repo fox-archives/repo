@@ -1,3 +1,4 @@
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::{fs, io, path::PathBuf, process::exit};
 
@@ -62,7 +63,7 @@ impl RunInternal {
 		clap_complete::generate(gen, cmd, "repomgr", &mut io::stdout());
 	}
 
-	pub fn generate_readme(&self) {
+	pub fn generate_readme(&self) -> Result<()> {
 		let readme_template_file = PathBuf::from("README.md.jinja");
 		if !readme_template_file.exists() {
 			eprintln!("README.md.jinja file not found");
@@ -76,21 +77,21 @@ impl RunInternal {
 		}
 
 		let repomgr_config: LocalFoxxoManifest =
-			toml::from_str(fs::read_to_string(foxxo_file).unwrap().as_str()).unwrap();
+			toml::from_str(fs::read_to_string(foxxo_file)?.as_str())?;
 		match repomgr_config.project.ecosystem.as_str() {
 			"rust" => {
 				let cargo_toml_content: cargo_toml::Manifest =
-					toml::from_str(fs::read_to_string("Cargo.toml").unwrap().as_str()).unwrap();
+					toml::from_str(fs::read_to_string("Cargo.toml")?.as_str())?;
 
 				let p = cargo_toml_content.package.unwrap();
 				let project_name = p.name;
 				let project_description = p.description.unwrap();
 				let project_description = project_description.unwrap();
 
-				let input_file = fs::read_to_string(readme_template_file).unwrap();
+				let input_file = fs::read_to_string(readme_template_file)?;
 				let mut env = Environment::new();
-				env.add_template("default", input_file.as_str()).unwrap();
-				let tmpl = env.get_template("default").unwrap();
+				env.add_template("default", input_file.as_str())?;
+				let tmpl = env.get_template("default")?;
 				let output_file = tmpl
 					.render(
 						context!(readme_pre => format!("# {project_name}\n\n{project_description}\n\n---"), readme_post => "", readme_heading_installation => r"## Installation
@@ -98,10 +99,9 @@ impl RunInternal {
 cargo install exa
 ```
 ")
-					)
-					.unwrap();
+					)?;
 
-				fs::write("README.md", output_file.as_str()).unwrap();
+				fs::write("README.md", output_file.as_str())?;
 			}
 			"basalt" => {
 				let basalt_toml_file = PathBuf::from("basalt.toml");
@@ -112,15 +112,15 @@ cargo install exa
 				}
 
 				let basalt_toml: BasaltManifest =
-					toml::from_str(fs::read_to_string(basalt_toml_file).unwrap().as_str()).unwrap();
+					toml::from_str(fs::read_to_string(basalt_toml_file)?.as_str())?;
 				let project_name = basalt_toml.package.name;
 				let project_description = basalt_toml.package.description;
 				let project_slug = basalt_toml.package.slug;
 
-				let input_file = fs::read_to_string(readme_template_file).unwrap();
+				let input_file = fs::read_to_string(readme_template_file)?;
 				let mut env = Environment::new();
-				env.add_template("default", input_file.as_str()).unwrap();
-				let tmpl = env.get_template("default").unwrap();
+				env.add_template("default", input_file.as_str())?;
+				let tmpl = env.get_template("default")?;
 				let output_file = tmpl
 						.render(
 							context!(readme_pre => format!("# {project_name}\n\n{project_description}\n\n---"), readme_post => "", readme_heading_installation => format!("## Installation
@@ -134,12 +134,14 @@ basalt add hyperupcall/bash-object/{project_slug}
 						)
 						.unwrap();
 
-				fs::write("README.md", output_file.as_str()).unwrap();
+				fs::write("README.md", output_file.as_str())?;
 			}
 			_ => {
 				eprintln!("ecosystem not supported");
 				exit(1);
 			}
 		}
+
+		Ok(())
 	}
 }

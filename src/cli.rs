@@ -48,7 +48,11 @@ pub enum TemplateCmd {
 
 #[derive(Subcommand, Debug)]
 pub enum DeployCmd {
-	Start,
+	Now,
+	Add {},
+	Set {},
+	Info { bin: String },
+	List,
 }
 
 #[derive(Subcommand, Debug)]
