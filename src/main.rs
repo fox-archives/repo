@@ -7,34 +7,13 @@ mod config;
 mod repo;
 mod util;
 
-use cli::{Cli, Cmd, DeployCmd, InternalCmd, TemplateCmd};
-use commands::{RunDeploy, RunGui, RunInternal, RunTask, RunTemplate};
+use cli::{Cli, Cmd, DeployCmd, InternalCmd};
+use commands::{RunDeploy, RunGui, RunInternal, RunTask};
 use util::get_template_info;
 
 fn main() {
 	let cli = Cli::parse();
 	match &cli.cmd {
-		Cmd::Template { cmd } => {
-			let run_template = RunTemplate::new();
-
-			match &cmd {
-				TemplateCmd::Use {
-					template_name,
-					target_dirname,
-					watch,
-				} => {
-					let template = get_template_info(template_name.clone(), target_dirname.clone());
-
-					run_template.command_use(template, *watch).unwrap();
-				}
-				TemplateCmd::New { template_name } => {
-					run_template.command_new(template_name.clone()).unwrap();
-				}
-				TemplateCmd::List {} => {
-					run_template.list().unwrap();
-				}
-			};
-		}
 		Cmd::Task {
 			list,
 			ecosystem,

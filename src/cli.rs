@@ -8,10 +8,6 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Cmd {
-	Template {
-		#[command(subcommand)]
-		cmd: TemplateCmd,
-	},
 	Task {
 		#[arg(long, default_value_t = false)]
 		list: bool,
@@ -30,21 +26,6 @@ pub enum Cmd {
 		#[command(subcommand)]
 		cmd: InternalCmd,
 	},
-}
-
-#[derive(Subcommand, Debug)]
-pub enum TemplateCmd {
-	Use {
-		template_name: String,
-		target_dirname: String,
-
-		#[arg(short, long, default_value_t = false)]
-		watch: bool,
-	},
-	New {
-		template_name: String,
-	},
-	List {},
 }
 
 #[derive(Subcommand, Debug)]
