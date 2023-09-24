@@ -1019,6 +1019,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "fox-repo"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cargo_toml",
+ "clap",
+ "clap_complete",
+ "directories",
+ "dirs",
+ "eframe",
+ "env_logger",
+ "minijinja",
+ "notify",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml",
+ "walkdir",
+]
+
+[[package]]
 name = "fsevent-sys"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2006,27 +2027,6 @@ name = "regex-syntax"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "436b050e76ed2903236f032a59761c1eb99e1b0aead2c257922771dab1fc8c78"
-
-[[package]]
-name = "repomgr"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cargo_toml",
- "clap",
- "clap_complete",
- "directories",
- "dirs",
- "eframe",
- "env_logger",
- "minijinja",
- "notify",
- "serde",
- "serde_json",
- "tokio",
- "toml",
- "walkdir",
-]
 
 [[package]]
 name = "rustix"
